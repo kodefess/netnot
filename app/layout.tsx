@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { receiptFontVariables, uiFontVariables } from '@/lib/fonts'
 
 export const metadata: Metadata = {
   title: 'Receipt Studio — receipts with a point of view',
@@ -40,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${uiFontVariables} ${receiptFontVariables} antialiased`}>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

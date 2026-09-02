@@ -1,3 +1,4 @@
 minimumReleaseAgeExclude:
   - '@next/*'
   - next
+  - lucide-react@1.39.0

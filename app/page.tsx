@@ -15,7 +15,6 @@ import {
   Share2,
   Trash2,
   Upload,
-  WandSparkles,
   X,
 } from "lucide-react";
 
@@ -30,13 +29,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { Theme, themes } from "@/lib/themes";
 
 // Kelas dasar untuk Input & Select agar warna, radius, dan ring fokusnya
-// mengikuti tema nota yang sedang aktif (lewat CSS var --ink/--paper/--accent/
-// --control-radius yang di-set di elemen <main>), bukan gaya default shadcn
-// yang generic — supaya tidak terasa "nyeleneh" dari desain nota.
+// mengikuti tema studio (lewat CSS var --ink/--paper/--accent/
+// --control-radius di-set pada elemen <main>), bukan gaya shadcn default.
 const controlClass =
-  "w-full rounded-[var(--control-radius)] border border-[color:var(--ink)]/15 bg-[color:var(--paper)] px-3 py-2 text-[15px] text-[color:var(--ink)] shadow-none transition-colors placeholder:text-[color:var(--ink)]/40 focus-visible:border-[color:var(--accent)] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/30 focus-visible:ring-offset-0";
+  "h-11 w-full rounded-[var(--control-radius)] border border-[color:var(--ink)]/14 bg-[color:var(--panel)] px-3.5 text-[15px] text-[color:var(--ink)] shadow-none transition-[border-color,box-shadow] duration-150 placeholder:text-[color:var(--ink)]/35 focus-visible:border-[color:var(--accent)] focus-visible:ring-4 focus-visible:ring-[color:var(--accent)]/15 focus-visible:ring-offset-0";
 
 type Item = {
   id: number;
@@ -45,152 +44,7 @@ type Item = {
   qty: number;
   price: number;
 };
-type Theme = {
-  name: string;
-  vibe: string;
-  ink: string;
-  accent: string;
-  paper: string;
-  surface: string;
-  font: string;
-  shape: string;
-  pattern: string;
-};
 
-const themes: Theme[] = [
-  {
-    name: "Cute",
-    vibe: "Soft & sunny",
-    ink: "#542b45",
-    accent: "#ff9fc5",
-    paper: "#fff6fb",
-    surface: "#542b45",
-    font: "round",
-    shape: "22px",
-    pattern: "dots",
-  },
-  {
-    name: "Cool",
-    vibe: "Electric blue",
-    ink: "#102a52",
-    accent: "#73a7ff",
-    paper: "#f3f7ff",
-    surface: "#10213d",
-    font: "mono",
-    shape: "4px",
-    pattern: "grid",
-  },
-  {
-    name: "Classic",
-    vibe: "Timeless paper",
-    ink: "#29251f",
-    accent: "#c9a46c",
-    paper: "#fbf6e9",
-    surface: "#3d372f",
-    font: "serif",
-    shape: "0px",
-    pattern: "none",
-  },
-  {
-    name: "Modern",
-    vibe: "Clean contrast",
-    ink: "#111111",
-    accent: "#b9f34a",
-    paper: "#ffffff",
-    surface: "#111111",
-    font: "sans",
-    shape: "12px",
-    pattern: "none",
-  },
-  {
-    name: "Editorial",
-    vibe: "Ink & margin",
-    ink: "#302d55",
-    accent: "#b8a9ff",
-    paper: "#f7f5ff",
-    surface: "#302d55",
-    font: "serif",
-    shape: "0px",
-    pattern: "lines",
-  },
-  {
-    name: "Retro",
-    vibe: "Peachy nostalgia",
-    ink: "#713f32",
-    accent: "#ffb15c",
-    paper: "#fff1dc",
-    surface: "#713f32",
-    font: "round",
-    shape: "16px",
-    pattern: "dots",
-  },
-  {
-    name: "Minimal",
-    vibe: "Quiet essentials",
-    ink: "#454545",
-    accent: "#d7d7d7",
-    paper: "#fafafa",
-    surface: "#454545",
-    font: "mono",
-    shape: "2px",
-    pattern: "none",
-  },
-  {
-    name: "Botanical",
-    vibe: "Mossy greenhouse",
-    ink: "#22392a",
-    accent: "#8fbf6a",
-    paper: "#f2f6ec",
-    surface: "#22392a",
-    font: "serif",
-    shape: "10px",
-    pattern: "lines",
-  },
-  {
-    name: "Noir",
-    vibe: "Midnight & gold",
-    ink: "#f2ece0",
-    accent: "#d8b25c",
-    paper: "#171512",
-    surface: "#000000",
-    font: "serif",
-    shape: "2px",
-    pattern: "none",
-  },
-  {
-    name: "Pastel",
-    vibe: "Cotton-candy calm",
-    ink: "#4a3b5c",
-    accent: "#c9b6ff",
-    paper: "#faf7ff",
-    surface: "#4a3b5c",
-    font: "round",
-    shape: "18px",
-    pattern: "dots",
-  },
-  {
-    name: "Sunset",
-    vibe: "Coral horizon",
-    ink: "#5c2a1f",
-    accent: "#ff7a59",
-    paper: "#fff3ea",
-    surface: "#5c2a1f",
-    font: "sans",
-    shape: "14px",
-    pattern: "grid",
-  },
-  {
-    name: "Thermal",
-    vibe: "Register tape",
-    ink: "#1a1a1a",
-    accent: "#1a1a1a",
-    paper: "#ffffff",
-    surface: "#1a1a1a",
-    font: "mono",
-    shape: "0px",
-    pattern: "lines",
-  },
-];
 const initialItems: Item[] = [
   {
     id: 1,
@@ -201,16 +55,27 @@ const initialItems: Item[] = [
   },
   { id: 2, name: "Studio mug", detail: "matte black", qty: 2, price: 16 },
 ];
+
 const currencies = [
-  { code: "IDR", label: "Indonesian Rupiah", flag: "ID", locale: "id-ID" },
-  { code: "USD", label: "US Dollar", flag: "US", locale: "en-US" },
+  { code: "IDR", label: "Indonesian rupiah", flag: "ID", locale: "id-ID" },
+  { code: "USD", label: "US dollar", flag: "US", locale: "en-US" },
   { code: "EUR", label: "Euro", flag: "EU", locale: "de-DE" },
-  { code: "GBP", label: "British Pound", flag: "GB", locale: "en-GB" },
-  { code: "JPY", label: "Japanese Yen", flag: "JP", locale: "ja-JP" },
-  { code: "SGD", label: "Singapore Dollar", flag: "SG", locale: "en-SG" },
-  { code: "MYR", label: "Malaysian Ringgit", flag: "MY", locale: "ms-MY" },
-  { code: "AUD", label: "Australian Dollar", flag: "AU", locale: "en-AU" },
+  { code: "GBP", label: "British pound", flag: "GB", locale: "en-GB" },
+  { code: "JPY", label: "Japanese yen", flag: "JP", locale: "ja-JP" },
+  { code: "SGD", label: "Singapore dollar", flag: "SG", locale: "en-SG" },
+  { code: "MYR", label: "Malaysian ringgit", flag: "MY", locale: "ms-MY" },
+  { code: "AUD", label: "Australian dollar", flag: "AU", locale: "en-AU" },
 ];
+
+// EU tidak punya representasi regional-indicator standar, jadi dipetakan
+// manual ke bendera Uni Eropa; kode negara lain dikonversi otomatis.
+const isoToFlag = (iso: string) =>
+  iso === "EU"
+    ? "🇪🇺"
+    : iso
+        .toUpperCase()
+        .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+
 const money = (value: number, currency: string) => {
   const option =
     currencies.find((item) => item.code === currency) ?? currencies[0];
@@ -227,12 +92,14 @@ function Field({
   value,
   onChange,
   type = "text",
+  hint,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
+  hint?: string;
 }) {
   return (
     <div className="field">
@@ -244,6 +111,52 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         className={controlClass}
       />
+      {hint && <p className="field-hint">{hint}</p>}
+    </div>
+  );
+}
+
+function FieldGroup({
+  title,
+  span,
+  children,
+}: {
+  title: string;
+  span?: "full";
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={cn("field-group", span === "full" && "field-group-full")}>
+      <h4>{title}</h4>
+      <div className="field-group-grid">{children}</div>
+    </div>
+  );
+}
+
+function StepHeading({
+  index,
+  title,
+  description,
+  meta,
+}: {
+  index: number;
+  title: string;
+  description: string;
+  meta?: string;
+}) {
+  return (
+    <div className="step-heading">
+      <span className="step-index">{index}</span>
+      <div className="step-copy">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+      {meta && (
+        <span className="step-meta">
+          <span className="step-meta-dot" />
+          {meta}
+        </span>
+      )}
     </div>
   );
 }
@@ -280,13 +193,15 @@ function Receipt({
   return (
     <article
       ref={receiptRef}
-      className={`receipt receipt-${theme.font} pattern-${theme.pattern}`}
+      className={`receipt pattern-${theme.pattern}`}
       style={
         {
           "--receipt-ink": theme.ink,
           "--receipt-accent": theme.accent,
           "--receipt-paper": theme.paper,
           "--receipt-radius": theme.shape,
+          "--receipt-font": theme.font,
+          "--receipt-weight": theme.weight,
         } as React.CSSProperties
       }
     >
@@ -296,10 +211,7 @@ function Receipt({
           {logo ? (
             <img src={logo} alt={`${store} logo`} crossOrigin="anonymous" />
           ) : (
-            <>
-              <span>r</span>
-              <b>r</b>
-            </>
+            <span>{(store || "R").trim().charAt(0).toUpperCase()}</span>
           )}
         </div>
         <div className="receipt-date">
@@ -309,7 +221,7 @@ function Receipt({
         </div>
       </header>
       <div className="receipt-intro">
-        <p className="eyebrow">{title || "Payment receipt"}</p>
+        <p className="receipt-kicker">{title || "Payment receipt"}</p>
         <h2>{store || "Your store"}</h2>
         <p>Thanks for shopping with us.</p>
       </div>
@@ -340,7 +252,7 @@ function Receipt({
       </div>
       <div className="receipt-payment">
         <div>
-          <span>PAID VIA</span>
+          <span>Paid via</span>
           <strong>{payment || "Not specified"}</strong>
         </div>
         <Check size={18} />
@@ -388,10 +300,9 @@ export default function Page() {
     );
   const [downloading, setDownloading] = useState(false);
 
-  // Pilih tema acak setiap kali halaman di-refresh. Dilakukan di useEffect
-  // (bukan langsung di useState) supaya render pertama di server & client
-  // tetap sama persis dan tidak memicu hydration mismatch — tema acak baru
-  // "muncul" sesaat setelah halaman ter-mount di browser.
+  // Pilih tema acak setiap kali halaman di-refresh, dilakukan di useEffect
+  // (bukan langsung di useState) supaya render pertama server & client
+  // tetap identik dan tidak memicu hydration mismatch.
   useEffect(() => {
     const random = themes[Math.floor(Math.random() * themes.length)];
     setTheme(random);
@@ -432,8 +343,8 @@ export default function Page() {
     setTimeout(() => setCopied(false), 1800);
   };
 
-  // Menunggu dua animation frame supaya browser benar-benar selesai melayout & mengecat
-  // node sebelum di-capture — mencegah hasil gambar yang terpotong/kosong.
+  // Menunggu dua animation frame supaya browser benar-benar selesai
+  // melayout & mengecat sebelum di-capture, mencegah hasil terpotong.
   const nextPaint = () =>
     new Promise<void>((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
@@ -443,18 +354,10 @@ export default function Page() {
     if (!receiptRef.current || downloading) return;
     setDownloading(true);
     try {
-      // Pastikan web font sudah termuat, kalau tidak teks bisa render dengan font
-      // fallback saat di-capture meskipun terlihat benar di layar.
       if (document.fonts?.ready) await document.fonts.ready;
       await nextPaint();
 
       const node = receiptRef.current;
-      // Ambil ukuran nyata dari elemen yang sedang tampil, alih-alih memaksa
-      // lebar/tinggi lain. Sebelumnya lebar di-hardcode ke 660px tapi tinggi
-      // dihitung dari scrollHeight pada lebar tampilan saat ini — begitu
-      // html-to-image me-render ulang pada lebar 660px, teks reflow dan
-      // tingginya jadi tidak cocok lagi, sehingga gambar unduhan terpotong
-      // atau menyisakan area kosong di bawah.
       const { width, height } = node.getBoundingClientRect();
 
       const dataUrl = await toPng(node, {
@@ -463,11 +366,7 @@ export default function Page() {
         pixelRatio: 3,
         cacheBust: true,
         backgroundColor: theme.paper,
-        style: {
-          margin: "0",
-          boxShadow: "none",
-          transform: "none",
-        },
+        style: { margin: "0", boxShadow: "none", transform: "none" },
         filter: (element) => !element.classList?.contains("receipt-copy"),
       });
 
@@ -490,14 +389,13 @@ export default function Page() {
         {
           "--accent": theme.accent,
           "--ink": theme.ink,
-          "--paper": theme.paper,
-          "--control-radius": theme.shape,
+          "--control-radius": theme.shape === "0px" ? "3px" : theme.shape,
         } as React.CSSProperties
       }
     >
       <nav className="topbar">
         <a className="brand" href="#">
-          <span className="brand-icon">r</span> receipt studio
+          <span className="brand-icon">r</span> Receipt studio
         </a>
         <div className="top-actions">
           <Button
@@ -531,141 +429,130 @@ export default function Page() {
           </Button>
         </div>
       </nav>
+
       <section className="hero">
-        <div>
-          <p className="kicker">
-            <WandSparkles size={14} /> receipt maker / 02
-          </p>
-          <h1>Receipts, with a point of view.</h1>
+        <div className="hero-copy-block">
+          <p className="hero-kicker">Free receipt generator</p>
+          <h1>
+            Receipts that actually <em>look</em> like your brand.
+          </h1>
           <p className="hero-copy">
-            Build a receipt that feels like your brand. Add your mark, choose
-            your mood, and make every little detail count.
+            Fill in the details, drop your logo in, and pick a mood — the
+            preview updates as you type, so what you see is what gets
+            printed.
           </p>
         </div>
         <div className="hero-total">
-          <span>current total</span>
+          <span>Current total</span>
           <strong>{money(total, currency)}</strong>
+          <small>{items.length} line items</small>
         </div>
       </section>
+
       <div className="workspace">
         <section className="editor-panel">
-          <div className="panel-heading">
-            <div>
-              <span className="section-label">01 / details</span>
-              <h3>Make it yours.</h3>
-            </div>
-            <span className="step-chip">live</span>
-          </div>
-          <div className="fields-grid">
-            <Field
-              id="store-name"
-              label="Store name"
-              value={store}
-              onChange={setStore}
-            />
-            <Field
-              id="receipt-title"
-              label="Receipt title"
-              value={title}
-              onChange={setTitle}
-            />
-            <Field
-              id="order-number"
-              label="Order number"
-              value={order}
-              onChange={setOrder}
-            />
-            <Field
-              id="receipt-date"
-              label="Date"
-              value={date}
-              onChange={setDate}
-            />
-            <Field
-              id="payment-method"
-              label="Payment method"
-              value={payment}
-              onChange={setPayment}
-            />
-            <div className="field">
-              <Label htmlFor="currency">Currency</Label>
-              <Select value={currency} onValueChange={handleCurrencyChange}>
-                <SelectTrigger
-                  id="currency"
-                  aria-label="Currency"
-                  className={cn(controlClass, "justify-between")}
-                >
-                  <SelectValue placeholder="Choose a currency" />
-                </SelectTrigger>
-                <SelectContent className="border-[color:var(--ink)]/15 bg-[color:var(--paper)] text-[color:var(--ink)]">
-                  {currencies.map((item) => (
-                    <SelectItem
-                      key={item.code}
-                      value={item.code}
-                      className="focus:bg-[color:var(--accent)]/20 focus:text-[color:var(--ink)]"
+          <StepHeading
+            index={1}
+            title="Make it yours"
+            description="Set the identity, order info, and a short note."
+            meta="Live preview"
+          />
+
+          <div className="fields-stack">
+            <FieldGroup title="Identity">
+              <Field id="store-name" label="Store name" value={store} onChange={setStore} />
+              <Field id="receipt-title" label="Receipt title" value={title} onChange={setTitle} />
+
+              <div className="field field-logo">
+                <Label>Store logo</Label>
+                <div className="logo-upload">
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleLogo}
+                    hidden
+                  />
+                  {logo ? (
+                    <div className="logo-actions">
+                      <img src={logo} alt="Uploaded logo preview" />
+                      <span>Logo ready for print.</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setLogo("")}
+                        aria-label="Remove logo"
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="upload-button"
+                      onClick={() => fileRef.current?.click()}
                     >
-                      {item.code} · {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Field
-              id="personal-note"
-              label="Personal note"
-              value={note}
-              onChange={setNote}
-            />
-          </div>
-
-          <div className="logo-upload">
-            <div>
-              <span className="section-label">Store logo</span>
-              <p>
-                {logo
-                  ? "Your logo is ready for print."
-                  : "A square image works best. PNG, JPG, or WEBP."}
-              </p>
-            </div>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onChange={handleLogo}
-              hidden
-            />
-            {logo ? (
-              <div className="logo-actions">
-                <img src={logo} alt="Uploaded logo preview" />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setLogo("")}
-                  aria-label="Remove logo"
-                >
-                  <X size={14} />
-                </Button>
+                      <Upload size={15} /> Upload a square image
+                    </Button>
+                  )}
+                </div>
               </div>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                className="upload-button"
-                onClick={() => fileRef.current?.click()}
-              >
-                <Upload size={15} /> Upload logo
-              </Button>
-            )}
+            </FieldGroup>
+
+            <FieldGroup title="Order & payment">
+              <Field id="order-number" label="Order number" value={order} onChange={setOrder} />
+              <Field id="receipt-date" label="Date" value={date} onChange={setDate} />
+              <Field id="payment-method" label="Payment method" value={payment} onChange={setPayment} />
+
+              <div className="field">
+                <Label htmlFor="currency">Currency</Label>
+                <Select value={currency} onValueChange={handleCurrencyChange}>
+                  <SelectTrigger
+                    id="currency"
+                    aria-label="Currency"
+                    className={cn(controlClass, "justify-between")}
+                  >
+                    <SelectValue placeholder="Choose a currency" />
+                  </SelectTrigger>
+                  <SelectContent className="border-[color:var(--ink)]/14 bg-[color:var(--panel)] text-[color:var(--ink)]">
+                    {currencies.map((item) => (
+                      <SelectItem
+                        key={item.code}
+                        value={item.code}
+                        className="focus:bg-[color:var(--accent)]/15 focus:text-[color:var(--ink)]"
+                      >
+                        <span className="currency-option">
+                          <span aria-hidden>{isoToFlag(item.flag)}</span>
+                          {item.code}
+                          <small>{item.label}</small>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </FieldGroup>
+
+            <FieldGroup title="Note" span="full">
+              <Field
+                id="personal-note"
+                label="Personal note"
+                value={note}
+                onChange={setNote}
+                hint="Shown in quotes near the bottom of the receipt."
+              />
+            </FieldGroup>
           </div>
 
-          <div className="panel-heading items-heading">
-            <div>
-              <span className="section-label">02 / line items</span>
-              <h3>What was bought?</h3>
-            </div>
-            <span className="item-count">{items.length} rows</span>
-          </div>
+          <StepHeading
+            index={2}
+            title="What was bought"
+            description="Add, edit, or remove the line items."
+            meta={`${items.length} ${items.length === 1 ? "row" : "rows"}`}
+          />
+
           <div className="items-editor">
             {items.map((i) => (
               <div className="item-row" key={i.id}>
@@ -680,10 +567,7 @@ export default function Page() {
                     aria-label="Item detail"
                     value={i.detail}
                     onChange={(e) => updateItem(i.id, "detail", e.target.value)}
-                    className={cn(
-                      controlClass,
-                      "sub-input text-[13px] opacity-80",
-                    )}
+                    className={cn(controlClass, "sub-input")}
                   />
                 </div>
                 <div className="qty">
@@ -691,9 +575,7 @@ export default function Page() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() =>
-                      updateItem(i.id, "qty", Math.max(1, i.qty - 1))
-                    }
+                    onClick={() => updateItem(i.id, "qty", Math.max(1, i.qty - 1))}
                     aria-label="Decrease quantity"
                   >
                     <Minus size={13} />
@@ -717,9 +599,7 @@ export default function Page() {
                     min="0"
                     step="0.01"
                     value={i.price}
-                    onChange={(e) =>
-                      updateItem(i.id, "price", Number(e.target.value))
-                    }
+                    onChange={(e) => updateItem(i.id, "price", Number(e.target.value))}
                     className={cn(controlClass, "text-right")}
                   />
                 </label>
@@ -743,54 +623,55 @@ export default function Page() {
             onClick={() =>
               setItems([
                 ...items,
-                {
-                  id: Date.now(),
-                  name: "New item",
-                  detail: "add a detail",
-                  qty: 1,
-                  price: 0,
-                },
+                { id: Date.now(), name: "New item", detail: "add a detail", qty: 1, price: 0 },
               ])
             }
           >
             <Plus size={16} /> Add another item
           </Button>
 
-          <div className="customize">
-            <div className="panel-heading">
-              <div>
-                <span className="section-label">03 / atmosphere</span>
-                <h3>Pick your mood.</h3>
-              </div>
-              <ImagePlus size={17} />
-            </div>
-            <div className="theme-list">
-              {themes.map((o) => (
-                <button
-                  key={o.name}
-                  type="button"
-                  className={`theme-option ${theme.name === o.name ? "active" : ""}`}
-                  onClick={() => setTheme(o)}
+          <StepHeading
+            index={3}
+            title="Pick the mood"
+            description="Each mood carries its own palette and typeface."
+          />
+
+          <div className="theme-list">
+            {themes.map((o) => (
+              <button
+                key={o.name}
+                type="button"
+                className={cn("theme-option", theme.name === o.name && "active")}
+                onClick={() => setTheme(o)}
+              >
+                <span
+                  className="theme-swatch"
+                  style={{
+                    background: o.paper,
+                    color: o.ink,
+                    fontFamily: o.font,
+                    fontWeight: o.weight,
+                  }}
                 >
                   <span
-                    className="theme-swatch"
-                    style={{ background: o.accent, color: o.ink }}
-                  >
-                    Aa
-                  </span>
-                  <span className="theme-copy">
-                    <b>{o.name}</b>
-                    <small>{o.vibe}</small>
-                  </span>
-                  {theme.name === o.name && <Check size={15} />}
-                </button>
-              ))}
-            </div>
+                    className="theme-swatch-accent"
+                    style={{ background: o.accent }}
+                  />
+                  Aa
+                </span>
+                <span className="theme-copy">
+                  <b>{o.name}</b>
+                  <small>{o.vibe}</small>
+                </span>
+                {theme.name === o.name && <Check size={15} />}
+              </button>
+            ))}
           </div>
         </section>
+
         <section className="preview-panel">
           <div className="preview-label">
-            <span>live preview / {theme.name}</span>
+            <span>Live preview — {theme.name}</span>
             <Button type="button" variant="ghost" size="sm" onClick={copy}>
               {copied ? (
                 <>
