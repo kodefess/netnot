@@ -4,7 +4,6 @@ import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import {
   Check,
-  Copy,
   Download,
   LoaderCircle,
   Minus,
@@ -66,16 +65,20 @@ const currencies = [
   { code: "AUD", label: "Australian dollar", flag: "AU", locale: "en-AU" },
 ];
 
-// EU tidak punya representasi regional-indicator standar, jadi dipetakan
-// manual ke bendera Uni Eropa; kode negara lain dikonversi otomatis.
-const isoToFlag = (iso: string) =>
-  iso === "EU"
-    ? "🇪🇺"
-    : iso
-        .toUpperCase()
-        .replace(/./g, (char) =>
-          String.fromCodePoint(127397 + char.charCodeAt(0)),
-        );
+// Beberapa varian ucapan terima kasih, tiap entri 2 baris (kalimat utama +
+// penutup singkat). Dipilih acak sekali per resi lewat pickThankYou(),
+// supaya preview tidak selalu menampilkan kalimat yang itu-itu saja.
+const thankYouMessages: [string, string][] = [
+  ["Thank you for your order!", "We hope to serve you again. 𓆩𓆪"],
+  ["Thanks a bunch for shopping with us!", "See you again soon. ✦"],
+  ["Your support means the world to us.", "Come back anytime. ⋆"],
+  ["Appreciate you choosing us today.", "Until next time. ˖"],
+  ["Every order makes our day.", "Thanks for stopping by. ⋆⁺"],
+  ["Made with care, just for you.", "Hope to see you again. 𓂃"],
+];
+
+const pickThankYou = () =>
+  thankYouMessages[Math.floor(Math.random() * thankYouMessages.length)];
 
 const money = (value: number, currency: string) => {
   const option =
@@ -86,6 +89,17 @@ const money = (value: number, currency: string) => {
     maximumFractionDigits: ["IDR", "JPY"].includes(option.code) ? 0 : 2,
   }).format(Math.max(0, value || 0));
 };
+
+// EU tidak punya representasi regional-indicator standar, jadi dipetakan
+// manual ke bendera Uni Eropa; kode negara lain dikonversi otomatis.
+const isoToFlag = (iso: string) =>
+  iso === "EU"
+    ? "🇪🇺"
+    : iso
+        .toUpperCase()
+        .replace(/./g, (char) =>
+          String.fromCodePoint(127397 + char.charCodeAt(0)),
+        );
 
 function Field({
   id,
@@ -168,12 +182,11 @@ function Receipt({
   order,
   date,
   payment,
-  note,
   items,
   theme,
   logo,
   currency,
-  onCopy,
+  thanks,
   receiptRef,
 }: {
   store: string;
@@ -181,12 +194,11 @@ function Receipt({
   order: string;
   date: string;
   payment: string;
-  note: string;
   items: Item[];
   theme: Theme;
   logo: string;
   currency: string;
-  onCopy: () => void;
+  thanks: [string, string];
   receiptRef: React.RefObject<HTMLElement | null>;
 }) {
   const total = items.reduce((s, i) => s + i.qty * i.price, 0),
@@ -206,59 +218,13 @@ function Receipt({
         } as React.CSSProperties
       }
     >
-      <svg
-        width="0"
-        height="0"
-        style={{ position: "absolute" }}
-        aria-hidden="true"
-      >
-        <filter id="stamp-roughen">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.9"
-            numOctaves="2"
-            seed="4"
-            result="noise"
-          />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.5" />
-        </filter>
-      </svg>
-
       <div className="receipt-topline" />
+
+      {/* Cap "Paid" berupa teks + cincin CSS murni (tidak bergantung pada
+          gambar logo atau mix-blend-mode), supaya aman saat di-capture
+          oleh html-to-image dan selalu tampil terlepas dari status logo. */}
       <div className="receipt-stamp" aria-hidden="true">
-        <svg viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" />
-          <circle cx="60" cy="60" r="44" />
-          <path
-            id="stampCurveTop"
-            d="M 14,60 A 46,46 0 0 1 106,60"
-            fill="none"
-          />
-          <path
-            id="stampCurveBottom"
-            d="M 106,64 A 46,46 0 0 1 14,64"
-            fill="none"
-          />
-          <text>
-            <textPath
-              href="#stampCurveTop"
-              startOffset="50%"
-              textAnchor="middle"
-            >
-              {store ? store.toUpperCase() : "RECEIPT STUDIO"}
-            </textPath>
-          </text>
-          <text className="stamp-word">PAID</text>
-          <text>
-            <textPath
-              href="#stampCurveBottom"
-              startOffset="50%"
-              textAnchor="middle"
-            >
-              {date || "—"}
-            </textPath>
-          </text>
-        </svg>
+        <span>Paid</span>
       </div>
 
       <header className="receipt-head">
@@ -278,7 +244,6 @@ function Receipt({
       <div className="receipt-intro">
         <p className="receipt-kicker">{title || "Payment receipt"}</p>
         <h2>{store || "Your store"}</h2>
-        <p>Thanks for shopping with us.</p>
       </div>
       <div className="receipt-rule" />
       <div className="receipt-items">
@@ -313,41 +278,11 @@ function Receipt({
         <Check size={18} />
       </div>
 
-      {/* <div className="receipt-signature">
-        <svg
-          className="signature-scribble"
-          viewBox="0 0 200 60"
-          aria-hidden="true"
-        >
-          <path
-            d="M4 40 C 20 10, 35 10, 45 30 C 55 50, 65 15, 78 20 C 92 26, 95 45, 110 38 C 125 30, 128 12, 145 22 C 158 30, 165 15, 180 25"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-        <p className="signature-name">{store || "Your store"}</p>
-        <div className="signature-foot">
-          <span className="signature-line" />
-          <span className="signature-caption">Authorized signature</span>
-        </div>
-      </div> */}
-
-      {note && <p className="receipt-note">“{note}”</p>}
-      <footer className="receipt-foot">
-        <span>made with receipt studio</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="receipt-copy"
-          onClick={onCopy}
-          aria-label="Copy receipt"
-        >
-          <Copy size={15} />
-        </Button>
-      </footer>
+      <p className="py-4 receipt-thanks">
+        {thanks[0]}
+        <br />
+        {thanks[1]}
+      </p>
       <div className="tear-line" />
     </article>
   );
@@ -359,9 +294,9 @@ export default function Page() {
     [order, setOrder] = useState("4829"),
     [date, setDate] = useState("09.02.2026"),
     [payment, setPayment] = useState("Visa •••• 4242"),
-    [note, setNote] = useState("A little something for your everyday."),
     [currency, setCurrency] = useState("IDR"),
     [theme, setTheme] = useState(themes[3]),
+    [thanks, setThanks] = useState<[string, string]>(thankYouMessages[0]),
     [logo, setLogo] = useState(""),
     [copied, setCopied] = useState(false),
     [items, setItems] = useState<Item[]>(initialItems);
@@ -377,12 +312,14 @@ export default function Page() {
     );
   const [downloading, setDownloading] = useState(false);
 
-  // Pilih tema acak setiap kali halaman di-refresh, dilakukan di useEffect
-  // (bukan langsung di useState) supaya render pertama server & client
-  // tetap identik dan tidak memicu hydration mismatch.
+  // Pilih tema & ucapan terima kasih secara acak setiap kali halaman
+  // di-refresh, dilakukan di useEffect (bukan langsung di useState) supaya
+  // render pertama server & client tetap identik dan tidak memicu
+  // hydration mismatch.
   useEffect(() => {
     const random = themes[Math.floor(Math.random() * themes.length)];
     setTheme(random);
+    setThanks(pickThankYou());
   }, []);
 
   const updateItem = (id: number, key: keyof Item, value: string | number) =>
@@ -406,10 +343,10 @@ export default function Page() {
     setOrder("4829");
     setDate("09.02.2026");
     setPayment("Visa •••• 4242");
-    setNote("A little something for your everyday.");
     setCurrency("IDR");
     setItems(initialItems);
     setTheme(themes[3]);
+    setThanks(pickThankYou());
     setLogo("");
   };
   const copy = async () => {
@@ -430,13 +367,13 @@ export default function Page() {
   const downloadImage = async () => {
     if (!receiptRef.current || downloading) return;
     setDownloading(true);
+    const node = receiptRef.current;
+
     try {
       if (document.fonts?.ready) await document.fonts.ready;
       await nextPaint();
 
-      const node = receiptRef.current;
       const { width, height } = node.getBoundingClientRect();
-
       const dataUrl = await toPng(node, {
         width: Math.ceil(width),
         height: Math.ceil(height),
@@ -635,16 +572,6 @@ export default function Page() {
                 </Select>
               </div>
             </FieldGroup>
-
-            <FieldGroup title="Note" span="full">
-              <Field
-                id="personal-note"
-                label="Personal note"
-                value={note}
-                onChange={setNote}
-                hint="Shown in quotes near the bottom of the receipt."
-              />
-            </FieldGroup>
           </div>
 
           <StepHeading
@@ -805,12 +732,11 @@ export default function Page() {
               order={order}
               date={date}
               payment={payment}
-              note={note}
               items={items}
               theme={theme}
               logo={logo}
               currency={currency}
-              onCopy={copy}
+              thanks={thanks}
               receiptRef={receiptRef}
             />
           </div>

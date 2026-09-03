@@ -621,53 +621,76 @@ body {
   border-radius: var(--receipt-radius) var(--receipt-radius) 0 0;
 }
 
+/* Cap "Paid": lingkaran ganda + teks, murni CSS (tanpa gambar atau
+   mix-blend-mode) supaya renderingnya konsisten di layar, print, dan
+   saat di-capture jadi PNG lewat html-to-image. Jarak dari atas dihitung
+   agar duduk di bawah header (mark + tanggal) dan sedikit menindih sudut
+   kanan atas kartu, meniru cara cap tinta sungguhan menimpa dokumen. */
 .receipt-stamp {
   position: absolute;
-  top: 4.4rem;
-  right: 1.4rem;
-  width: 6.75rem;
-  height: 6.75rem;
-  color: var(--receipt-accent);
-  opacity: 0.82;
-  mix-blend-mode: multiply;
-  transform: rotate(-11deg);
+  top: 4.35rem;
+  right: 1.35rem;
+  z-index: 2;
+  display: inline-grid;
+  place-items: center;
+  width: 5.3rem;
+  height: 5.1rem;
+  border-radius: 49% 51% 52% 48% / 52% 48% 53% 47%;
+  transform: rotate(-13deg);
   pointer-events: none;
-  filter: url(#stamp-roughen);
+  border: 2.5px solid var(--receipt-accent);
+  box-shadow:
+    inset 0 0 0 3px color-mix(in srgb, var(--receipt-accent) 35%, transparent),
+    inset 0 0 0 5px color-mix(in srgb, var(--receipt-accent) 14%, transparent);
+  background-image:
+    radial-gradient(
+      color-mix(in srgb, var(--receipt-accent) 60%, transparent) 0.55px,
+      transparent 0.6px
+    ),
+    radial-gradient(
+      color-mix(in srgb, var(--receipt-accent) 38%, transparent) 0.5px,
+      transparent 0.55px
+    );
+  background-size:
+    4px 4px,
+    3px 3px;
+  background-position:
+    0 0,
+    1.5px 1.5px;
+  opacity: 0.76;
 }
 
-.receipt-stamp svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+@media (max-width: 640px) {
+  .receipt-stamp {
+    width: 4.6rem;
+    height: 4.4rem;
+    top: 3.9rem;
+    right: 1rem;
+  }
+  .receipt-stamp::before {
+    inset: -3px;
+  }
+  .receipt-stamp span {
+    font-size: 0.75rem;
+  }
 }
 
-.receipt-stamp circle {
-  fill: none;
-  stroke: currentColor;
-}
-.receipt-stamp circle:first-of-type {
-  stroke-width: 2.5px;
-}
-.receipt-stamp circle:last-of-type {
-  stroke-width: 1.2px;
+/* Cincin hantu — meniru cap yang sedikit meleset saat ditekan ulang */
+.receipt-stamp::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--receipt-accent) 28%, transparent);
+  transform: rotate(5deg);
 }
 
-.receipt-stamp text {
-  fill: currentColor;
+.receipt-stamp span {
   font-family: var(--receipt-font), sans-serif;
-  font-weight: 700;
+  font-weight: var(--receipt-weight);
+  font-size: 0.86rem;
   letter-spacing: 0.14em;
-}
-
-.receipt-stamp textPath {
-  font-size: 8.5px;
-}
-
-.stamp-word {
-  font-size: 22px;
-  letter-spacing: 0.18em;
-  text-anchor: middle;
-  transform: translate(60px, 68px);
+  color: var(--receipt-accent);
 }
 
 .receipt-head {
@@ -809,16 +832,19 @@ body {
   color: var(--receipt-accent);
 }
 
-.receipt-note {
-  margin: 1.1rem 0 0;
-  font-size: 0.85rem;
-  font-style: italic;
-  opacity: 0.72;
-  line-height: 1.4;
+/* Ucapan terima kasih penutup: pakai font tanda tangan (Caveat) supaya
+   terasa personal dan senada dengan .signature-name, bukan teks sistem. */
+.receipt-thanks {
+  margin: 0.9rem 0 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--receipt-accent);
+  opacity: 0.8;
 }
 
 .receipt-foot {
-  margin-top: 1.4rem;
+  margin-top: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -947,6 +973,15 @@ body {
   .theme-list {
     grid-template-columns: 1fr;
   }
+  .receipt-stamp {
+    width: 4.4rem;
+    height: 4.4rem;
+    top: 3.9rem;
+    right: 1rem;
+  }
+  .receipt-stamp span {
+    font-size: 0.78rem;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -982,51 +1017,56 @@ body {
   }
 }
 
-/* Signature css */
+/* ------------------------------------------------------------------ */
+/* Signature                                                           */
+/* ------------------------------------------------------------------ */
 .receipt-signature {
-  position: relative;
-  margin-top: 1.2rem;
-  padding-top: 0.4rem;
-}
-
-.signature-scribble {
-  position: absolute;
-  top: -0.6rem;
-  right: 0.5rem;
-  width: 6rem;
-  height: auto;
-  color: color-mix(in srgb, var(--receipt-accent) 55%, transparent);
-  opacity: 0.5;
-  pointer-events: none;
+  margin-top: 1.5rem;
+  padding-top: 0.35rem;
+  text-align: right;
 }
 
 .signature-name {
+  display: inline-block;
   margin: 0;
+  padding: 0 0.35rem;
   font-family: var(--font-signature), cursive;
-  font-size: 1.8rem;
-  line-height: 1;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
   color: var(--receipt-ink);
-  transform: rotate(-2deg);
+  transform: rotate(-4deg);
+  transform-origin: right center;
+  /* sedikit membuat tinta terasa lebih natural */
+  opacity: 0.88;
 }
 
 .signature-foot {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.35rem;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.45rem;
 }
+
 .signature-line {
-  flex: 1;
+  width: 5.5rem;
   border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 25%, transparent);
 }
+
 .signature-caption {
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: color-mix(in srgb, var(--receipt-ink) 45%, transparent);
   white-space: nowrap;
 }
 
-/* Footer css */
+/* ------------------------------------------------------------------ */
+/* Footer                                                               */
+/* ------------------------------------------------------------------ */
 .app-footer {
   max-width: 84rem;
   margin: 4rem auto 0;
