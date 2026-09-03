@@ -14,17 +14,16 @@ export default function Footer() {
         <a className="brand footer-brand" href="#">
           <span className="brand-icon">r</span> Receipt studio
         </a>
-        <nav className="footer-links">
+        {/* <nav className="footer-links">
           {footerLinks.map((link) => (
             <Link key={link.label} href={link.href}>
               {link.label}
             </Link>
           ))}
-        </nav>
+        </nav> */}
       </div>
 
       <div className="footer-rule" />
-
       <div className="footer-bottom">
         <p>© {new Date().getFullYear()} Receipt studio. All rights reserved.</p>
         <p className="footer-made">

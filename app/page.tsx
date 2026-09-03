@@ -6,7 +6,6 @@ import {
   Check,
   Copy,
   Download,
-  ImagePlus,
   LoaderCircle,
   Minus,
   Plus,
@@ -51,9 +50,9 @@ const initialItems: Item[] = [
     name: "Daily tote bag",
     detail: "natural / one size",
     qty: 1,
-    price: 38,
+    price: 10000,
   },
-  { id: 2, name: "Studio mug", detail: "matte black", qty: 2, price: 16 },
+  { id: 2, name: "Studio mug", detail: "matte black", qty: 2, price: 20000 },
 ];
 
 const currencies = [
@@ -207,7 +206,61 @@ function Receipt({
         } as React.CSSProperties
       }
     >
+      <svg
+        width="0"
+        height="0"
+        style={{ position: "absolute" }}
+        aria-hidden="true"
+      >
+        <filter id="stamp-roughen">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.9"
+            numOctaves="2"
+            seed="4"
+            result="noise"
+          />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="3.5" />
+        </filter>
+      </svg>
+
       <div className="receipt-topline" />
+      <div className="receipt-stamp" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" />
+          <circle cx="60" cy="60" r="44" />
+          <path
+            id="stampCurveTop"
+            d="M 14,60 A 46,46 0 0 1 106,60"
+            fill="none"
+          />
+          <path
+            id="stampCurveBottom"
+            d="M 106,64 A 46,46 0 0 1 14,64"
+            fill="none"
+          />
+          <text>
+            <textPath
+              href="#stampCurveTop"
+              startOffset="50%"
+              textAnchor="middle"
+            >
+              {store ? store.toUpperCase() : "RECEIPT STUDIO"}
+            </textPath>
+          </text>
+          <text className="stamp-word">PAID</text>
+          <text>
+            <textPath
+              href="#stampCurveBottom"
+              startOffset="50%"
+              textAnchor="middle"
+            >
+              {date || "—"}
+            </textPath>
+          </text>
+        </svg>
+      </div>
+
       <header className="receipt-head">
         <div className="receipt-mark">
           {logo ? (
@@ -259,6 +312,28 @@ function Receipt({
         </div>
         <Check size={18} />
       </div>
+
+      {/* <div className="receipt-signature">
+        <svg
+          className="signature-scribble"
+          viewBox="0 0 200 60"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 40 C 20 10, 35 10, 45 30 C 55 50, 65 15, 78 20 C 92 26, 95 45, 110 38 C 125 30, 128 12, 145 22 C 158 30, 165 15, 180 25"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+        <p className="signature-name">{store || "Your store"}</p>
+        <div className="signature-foot">
+          <span className="signature-line" />
+          <span className="signature-caption">Authorized signature</span>
+        </div>
+      </div> */}
+
       {note && <p className="receipt-note">“{note}”</p>}
       <footer className="receipt-foot">
         <span>made with receipt studio</span>

@@ -47,7 +47,10 @@ export default function RootLayout({
       <body
         className={`${uiFontVariables} ${receiptFontVariables} antialiased`}
       >
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          {children}
+          <Footer />
+        </SmoothScroll>
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>

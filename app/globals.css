@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap");
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
@@ -14,6 +15,7 @@
   --app-line: rgba(28, 26, 23, 0.1);
   --app-line-strong: rgba(28, 26, 23, 0.16);
   --panel: var(--app-panel);
+  --font-signature: "Caveat", cursive;
 }
 
 * {
@@ -619,6 +621,55 @@ body {
   border-radius: var(--receipt-radius) var(--receipt-radius) 0 0;
 }
 
+.receipt-stamp {
+  position: absolute;
+  top: 4.4rem;
+  right: 1.4rem;
+  width: 6.75rem;
+  height: 6.75rem;
+  color: var(--receipt-accent);
+  opacity: 0.82;
+  mix-blend-mode: multiply;
+  transform: rotate(-11deg);
+  pointer-events: none;
+  filter: url(#stamp-roughen);
+}
+
+.receipt-stamp svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.receipt-stamp circle {
+  fill: none;
+  stroke: currentColor;
+}
+.receipt-stamp circle:first-of-type {
+  stroke-width: 2.5px;
+}
+.receipt-stamp circle:last-of-type {
+  stroke-width: 1.2px;
+}
+
+.receipt-stamp text {
+  fill: currentColor;
+  font-family: var(--receipt-font), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.receipt-stamp textPath {
+  font-size: 8.5px;
+}
+
+.stamp-word {
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  text-anchor: middle;
+  transform: translate(60px, 68px);
+}
+
 .receipt-head {
   display: flex;
   align-items: flex-start;
@@ -928,5 +979,127 @@ body {
     box-shadow: none;
     width: 100%;
     margin: 0 auto;
+  }
+}
+
+/* Signature css */
+.receipt-signature {
+  position: relative;
+  margin-top: 1.2rem;
+  padding-top: 0.4rem;
+}
+
+.signature-scribble {
+  position: absolute;
+  top: -0.6rem;
+  right: 0.5rem;
+  width: 6rem;
+  height: auto;
+  color: color-mix(in srgb, var(--receipt-accent) 55%, transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.signature-name {
+  margin: 0;
+  font-family: var(--font-signature), cursive;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--receipt-ink);
+  transform: rotate(-2deg);
+}
+
+.signature-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+}
+.signature-line {
+  flex: 1;
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 25%, transparent);
+}
+.signature-caption {
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--receipt-ink) 45%, transparent);
+  white-space: nowrap;
+}
+
+/* Footer css */
+.app-footer {
+  max-width: 84rem;
+  margin: 4rem auto 0;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+}
+
+.footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 1.5rem;
+}
+
+.footer-brand {
+  font-size: 1.05rem;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.footer-links a {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--app-ink) 65%, transparent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.footer-links a:hover {
+  color: var(--app-ink);
+}
+
+.footer-rule {
+  border-top: 1px solid var(--app-line);
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1.25rem 0 2.5rem;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--app-ink) 50%, transparent);
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.footer-made {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.footer-made svg {
+  color: var(--app-accent);
+}
+
+@media (max-width: 640px) {
+  .footer-top,
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media print {
+  .app-footer {
+    display: none !important;
   }
 }
