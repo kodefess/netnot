@@ -74,7 +74,9 @@ const isoToFlag = (iso: string) =>
     ? "🇪🇺"
     : iso
         .toUpperCase()
-        .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+        .replace(/./g, (char) =>
+          String.fromCodePoint(127397 + char.charCodeAt(0)),
+        );
 
 const money = (value: number, currency: string) => {
   const option =
@@ -438,8 +440,7 @@ export default function Page() {
           </h1>
           <p className="hero-copy">
             Fill in the details, drop your logo in, and pick a mood — the
-            preview updates as you type, so what you see is what gets
-            printed.
+            preview updates as you type, so what you see is what gets printed.
           </p>
         </div>
         <div className="hero-total">
@@ -460,8 +461,18 @@ export default function Page() {
 
           <div className="fields-stack">
             <FieldGroup title="Identity">
-              <Field id="store-name" label="Store name" value={store} onChange={setStore} />
-              <Field id="receipt-title" label="Receipt title" value={title} onChange={setTitle} />
+              <Field
+                id="store-name"
+                label="Store name"
+                value={store}
+                onChange={setStore}
+              />
+              <Field
+                id="receipt-title"
+                label="Receipt title"
+                value={title}
+                onChange={setTitle}
+              />
 
               <div className="field field-logo">
                 <Label>Store logo</Label>
@@ -502,9 +513,24 @@ export default function Page() {
             </FieldGroup>
 
             <FieldGroup title="Order & payment">
-              <Field id="order-number" label="Order number" value={order} onChange={setOrder} />
-              <Field id="receipt-date" label="Date" value={date} onChange={setDate} />
-              <Field id="payment-method" label="Payment method" value={payment} onChange={setPayment} />
+              <Field
+                id="order-number"
+                label="Order number"
+                value={order}
+                onChange={setOrder}
+              />
+              <Field
+                id="receipt-date"
+                label="Date"
+                value={date}
+                onChange={setDate}
+              />
+              <Field
+                id="payment-method"
+                label="Payment method"
+                value={payment}
+                onChange={setPayment}
+              />
 
               <div className="field">
                 <Label htmlFor="currency">Currency</Label>
@@ -575,7 +601,9 @@ export default function Page() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={() => updateItem(i.id, "qty", Math.max(1, i.qty - 1))}
+                    onClick={() =>
+                      updateItem(i.id, "qty", Math.max(1, i.qty - 1))
+                    }
                     aria-label="Decrease quantity"
                   >
                     <Minus size={13} />
@@ -599,7 +627,9 @@ export default function Page() {
                     min="0"
                     step="0.01"
                     value={i.price}
-                    onChange={(e) => updateItem(i.id, "price", Number(e.target.value))}
+                    onChange={(e) =>
+                      updateItem(i.id, "price", Number(e.target.value))
+                    }
                     className={cn(controlClass, "text-right")}
                   />
                 </label>
@@ -623,7 +653,13 @@ export default function Page() {
             onClick={() =>
               setItems([
                 ...items,
-                { id: Date.now(), name: "New item", detail: "add a detail", qty: 1, price: 0 },
+                {
+                  id: Date.now(),
+                  name: "New item",
+                  detail: "add a detail",
+                  qty: 1,
+                  price: 0,
+                },
               ])
             }
           >
@@ -641,7 +677,10 @@ export default function Page() {
               <button
                 key={o.name}
                 type="button"
-                className={cn("theme-option", theme.name === o.name && "active")}
+                className={cn(
+                  "theme-option",
+                  theme.name === o.name && "active",
+                )}
                 onClick={() => setTheme(o)}
               >
                 <span

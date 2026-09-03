@@ -20,6 +20,29 @@
   box-sizing: border-box;
 }
 
+/* Lenis css */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
 html,
 body {
   background: var(--app-bg);
@@ -142,7 +165,8 @@ body {
   align-items: flex-end;
   justify-content: space-between;
   gap: 2.5rem;
-  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 3rem) clamp(2rem, 5vw, 3rem);
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 3rem)
+    clamp(2rem, 5vw, 3rem);
   max-width: 84rem;
   margin: 0 auto;
 }
@@ -518,7 +542,9 @@ body {
   background: transparent;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 .theme-option:hover {
   border-color: var(--app-line-strong);
@@ -651,7 +677,8 @@ body {
 
 .receipt-rule {
   margin: 1.1rem 0;
-  border-top: 1.5px dashed color-mix(in srgb, var(--receipt-ink) 22%, transparent);
+  border-top: 1.5px dashed
+    color-mix(in srgb, var(--receipt-ink) 22%, transparent);
 }
 
 .receipt-items {
@@ -765,7 +792,8 @@ body {
     var(--receipt-paper) 0 6px,
     transparent 6px 12px
   );
-  mask: radial-gradient(circle 6px at 6px 0, transparent 98%, black 100%) repeat-x;
+  mask: radial-gradient(circle 6px at 6px 0, transparent 98%, black 100%)
+    repeat-x;
   mask-size: 12px 12px;
 }
 
@@ -778,7 +806,8 @@ body {
   background-size: 14px 14px;
 }
 .pattern-grid {
-  background-image: linear-gradient(
+  background-image:
+    linear-gradient(
       color-mix(in srgb, var(--receipt-ink) 7%, transparent) 1px,
       transparent 1px
     ),
@@ -806,7 +835,8 @@ body {
   background-size: 6px 6px;
 }
 .pattern-confetti {
-  background-image: radial-gradient(
+  background-image:
+    radial-gradient(
       color-mix(in srgb, var(--receipt-accent) 45%, transparent) 2px,
       transparent 2px
     ),
@@ -814,8 +844,12 @@ body {
       color-mix(in srgb, var(--receipt-ink) 15%, transparent) 1.5px,
       transparent 1.5px
     );
-  background-size: 22px 22px, 15px 15px;
-  background-position: 0 0, 8px 10px;
+  background-size:
+    22px 22px,
+    15px 15px;
+  background-position:
+    0 0,
+    8px 10px;
 }
 
 /* ------------------------------------------------------------------ */
