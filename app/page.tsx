@@ -28,271 +28,33 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Theme, themes } from "@/lib/themes";
-
-// Kelas dasar untuk Input & Select agar warna, radius, dan ring fokusnya
-// mengikuti tema studio (lewat CSS var --ink/--paper/--accent/
-// --control-radius di-set pada elemen <main>), bukan gaya shadcn default.
-const controlClass =
-  "h-11 w-full rounded-[var(--control-radius)] border border-[color:var(--ink)]/14 bg-[color:var(--panel)] px-3.5 text-[15px] text-[color:var(--ink)] shadow-none transition-[border-color,box-shadow] duration-150 placeholder:text-[color:var(--ink)]/35 focus-visible:border-[color:var(--accent)] focus-visible:ring-4 focus-visible:ring-[color:var(--accent)]/15 focus-visible:ring-offset-0";
-
-type Item = {
-  id: number;
-  name: string;
-  detail: string;
-  qty: number;
-  price: number;
-};
-
-const initialItems: Item[] = [
-  {
-    id: 1,
-    name: "Daily tote bag",
-    detail: "natural / one size",
-    qty: 1,
-    price: 10000,
-  },
-  { id: 2, name: "Studio mug", detail: "matte black", qty: 2, price: 20000 },
-];
-
-const currencies = [
-  { code: "IDR", label: "Indonesian rupiah", flag: "ID", locale: "id-ID" },
-  { code: "USD", label: "US dollar", flag: "US", locale: "en-US" },
-  { code: "EUR", label: "Euro", flag: "EU", locale: "de-DE" },
-  { code: "GBP", label: "British pound", flag: "GB", locale: "en-GB" },
-  { code: "JPY", label: "Japanese yen", flag: "JP", locale: "ja-JP" },
-  { code: "SGD", label: "Singapore dollar", flag: "SG", locale: "en-SG" },
-  { code: "MYR", label: "Malaysian ringgit", flag: "MY", locale: "ms-MY" },
-  { code: "AUD", label: "Australian dollar", flag: "AU", locale: "en-AU" },
-];
-
-// Beberapa varian ucapan terima kasih, tiap entri 2 baris (kalimat utama +
-// penutup singkat). Dipilih acak sekali per resi lewat pickThankYou(),
-// supaya preview tidak selalu menampilkan kalimat yang itu-itu saja.
-const thankYouMessages: [string, string][] = [
-  ["Thank you for your order!", "We hope to serve you again. 𓆩𓆪"],
-  ["Thanks a bunch for shopping with us!", "See you again soon. ✦"],
-  ["Your support means the world to us.", "Come back anytime. ⋆"],
-  ["Appreciate you choosing us today.", "Until next time. ˖"],
-  ["Every order makes our day.", "Thanks for stopping by. ⋆⁺"],
-  ["Made with care, just for you.", "Hope to see you again. 𓂃"],
-];
-
-const pickThankYou = () =>
-  thankYouMessages[Math.floor(Math.random() * thankYouMessages.length)];
-
-const money = (value: number, currency: string) => {
-  const option =
-    currencies.find((item) => item.code === currency) ?? currencies[0];
-  return new Intl.NumberFormat(option.locale, {
-    style: "currency",
-    currency: option.code,
-    maximumFractionDigits: ["IDR", "JPY"].includes(option.code) ? 0 : 2,
-  }).format(Math.max(0, value || 0));
-};
-
-// EU tidak punya representasi regional-indicator standar, jadi dipetakan
-// manual ke bendera Uni Eropa; kode negara lain dikonversi otomatis.
-const isoToFlag = (iso: string) =>
-  iso === "EU"
-    ? "🇪🇺"
-    : iso
-        .toUpperCase()
-        .replace(/./g, (char) =>
-          String.fromCodePoint(127397 + char.charCodeAt(0)),
-        );
-
-function Field({
-  id,
-  label,
-  value,
-  onChange,
-  type = "text",
-  hint,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  hint?: string;
-}) {
-  return (
-    <div className="field">
-      <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={controlClass}
-      />
-      {hint && <p className="field-hint">{hint}</p>}
-    </div>
-  );
-}
-
-function FieldGroup({
-  title,
-  span,
-  children,
-}: {
-  title: string;
-  span?: "full";
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={cn("field-group", span === "full" && "field-group-full")}>
-      <h4>{title}</h4>
-      <div className="field-group-grid">{children}</div>
-    </div>
-  );
-}
-
-function StepHeading({
-  index,
-  title,
-  description,
-  meta,
-}: {
-  index: number;
-  title: string;
-  description: string;
-  meta?: string;
-}) {
-  return (
-    <div className="step-heading">
-      <span className="step-index">{index}</span>
-      <div className="step-copy">
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
-      {meta && (
-        <span className="step-meta">
-          <span className="step-meta-dot" />
-          {meta}
-        </span>
-      )}
-    </div>
-  );
-}
-
-function Receipt({
-  store,
-  title,
-  order,
-  date,
-  payment,
-  items,
-  theme,
-  logo,
-  currency,
-  thanks,
-  receiptRef,
-}: {
-  store: string;
-  title: string;
-  order: string;
-  date: string;
-  payment: string;
-  items: Item[];
-  theme: Theme;
-  logo: string;
-  currency: string;
-  thanks: [string, string];
-  receiptRef: React.RefObject<HTMLElement | null>;
-}) {
-  const total = items.reduce((s, i) => s + i.qty * i.price, 0),
-    count = items.reduce((s, i) => s + i.qty, 0);
-  return (
-    <article
-      ref={receiptRef}
-      className={`receipt pattern-${theme.pattern}`}
-      style={
-        {
-          "--receipt-ink": theme.ink,
-          "--receipt-accent": theme.accent,
-          "--receipt-paper": theme.paper,
-          "--receipt-radius": theme.shape,
-          "--receipt-font": theme.font,
-          "--receipt-weight": theme.weight,
-        } as React.CSSProperties
-      }
-    >
-      <div className="receipt-topline" />
-
-      {/* Cap "Paid" berupa teks + cincin CSS murni (tidak bergantung pada
-          gambar logo atau mix-blend-mode), supaya aman saat di-capture
-          oleh html-to-image dan selalu tampil terlepas dari status logo. */}
-      <div className="receipt-stamp" aria-hidden="true">
-        <span>Paid</span>
-      </div>
-
-      <header className="receipt-head">
-        <div className="receipt-mark">
-          {logo ? (
-            <img src={logo} alt={`${store} logo`} crossOrigin="anonymous" />
-          ) : (
-            <span>{(store || "R").trim().charAt(0).toUpperCase()}</span>
-          )}
-        </div>
-        <div className="receipt-date">
-          {date || "—"}
-          <br />
-          <strong>#{order || "0000"}</strong>
-        </div>
-      </header>
-      <div className="receipt-intro">
-        <p className="receipt-kicker">{title || "Payment receipt"}</p>
-        <h2>{store || "Your store"}</h2>
-      </div>
-      <div className="receipt-rule" />
-      <div className="receipt-items">
-        {items.length ? (
-          items.map((i) => (
-            <div className="receipt-item" key={i.id}>
-              <div>
-                <strong>{i.name || "Item name"}</strong>
-                <small>
-                  {i.detail || `${i.qty} × ${money(i.price, currency)}`}
-                </small>
-              </div>
-              <span>{money(i.qty * i.price, currency)}</span>
-            </div>
-          ))
-        ) : (
-          <p className="empty-receipt">No items yet</p>
-        )}
-      </div>
-      <div className="receipt-rule" />
-      <div className="receipt-total">
-        <span>
-          Subtotal <small>{count} items</small>
-        </span>
-        <strong>{money(total, currency)}</strong>
-      </div>
-      <div className="receipt-payment">
-        <div>
-          <span>Paid via</span>
-          <strong>{payment || "Not specified"}</strong>
-        </div>
-        <Check size={18} />
-      </div>
-
-      <p className="py-4 receipt-thanks">
-        {thanks[0]}
-        <br />
-        {thanks[1]}
-      </p>
-      <div className="tear-line" />
-    </article>
-  );
-}
+import {
+  DEFAULT_DATE_PLACEHOLDER,
+  Item,
+  currencies,
+  getJakartaDate,
+  initialItems,
+  isoToFlag,
+  money,
+  pickThankYou,
+  thankYouMessages,
+} from "@/lib/receipt-utils";
+import {
+  Field,
+  FieldGroup,
+  StepHeading,
+  controlClass,
+} from "@/components/receipt/receipt-fields";
+import { Receipt } from "@/components/receipt/receipt-preview";
 
 export default function Page() {
   const [store, setStore] = useState("Morrow Goods"),
     [title, setTitle] = useState("Payment receipt"),
     [order, setOrder] = useState("4829"),
-    [date, setDate] = useState("09.02.2026"),
+    // Placeholder statis dulu; diganti ke tanggal Asia/Jakarta yang
+    // sebenarnya di useEffect supaya render pertama server & client
+    // tetap identik (hindari hydration mismatch).
+    [date, setDate] = useState(DEFAULT_DATE_PLACEHOLDER),
     [payment, setPayment] = useState("Visa •••• 4242"),
     [currency, setCurrency] = useState("IDR"),
     [theme, setTheme] = useState(themes[3]),
@@ -300,6 +62,7 @@ export default function Page() {
     [logo, setLogo] = useState(""),
     [copied, setCopied] = useState(false),
     [items, setItems] = useState<Item[]>(initialItems);
+  const [generatingNumber, setGeneratingNumber] = useState(false); // ← TAMBAHKAN INI
 
   const handleCurrencyChange = (value: string | null) => {
     setCurrency(value ?? "IDR");
@@ -312,14 +75,15 @@ export default function Page() {
     );
   const [downloading, setDownloading] = useState(false);
 
-  // Pilih tema & ucapan terima kasih secara acak setiap kali halaman
-  // di-refresh, dilakukan di useEffect (bukan langsung di useState) supaya
-  // render pertama server & client tetap identik dan tidak memicu
-  // hydration mismatch.
+  // Pilih tema, ucapan terima kasih, dan tanggal (Asia/Jakarta) secara
+  // acak/aktual setiap kali halaman di-refresh, dilakukan di useEffect
+  // (bukan langsung di useState) supaya render pertama server & client
+  // tetap identik dan tidak memicu hydration mismatch.
   useEffect(() => {
     const random = themes[Math.floor(Math.random() * themes.length)];
     setTheme(random);
     setThanks(pickThankYou());
+    setDate(getJakartaDate());
   }, []);
 
   const updateItem = (id: number, key: keyof Item, value: string | number) =>
@@ -341,7 +105,7 @@ export default function Page() {
     setStore("Morrow Goods");
     setTitle("Payment receipt");
     setOrder("4829");
-    setDate("09.02.2026");
+    setDate(getJakartaDate()); // kembali ke tanggal hari ini (Asia/Jakarta)
     setPayment("Visa •••• 4242");
     setCurrency("IDR");
     setItems(initialItems);
@@ -355,6 +119,32 @@ export default function Page() {
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
+  };
+
+  const generateReceiptNumber = async () => {
+    if (generatingNumber) return;
+    setGeneratingNumber(true);
+    try {
+      const res = await fetch("/api/receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ store, title, payment, currency, items, total }),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to generate receipt number");
+        alert("Gagal membuat nomor resi. Coba lagi.");
+        return;
+      }
+
+      const data = await res.json();
+      setOrder(data.receiptNumber); // "J-004", timpa field order otomatis
+    } catch (error) {
+      console.error("Error generating receipt number", error);
+      alert("Terjadi kesalahan saat membuat nomor resi.");
+    } finally {
+      setGeneratingNumber(false);
+    }
   };
 
   // Menunggu dua animation frame supaya browser benar-benar selesai
@@ -419,6 +209,20 @@ export default function Page() {
             onClick={reset}
           >
             <RotateCcw size={15} /> Reset
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="quiet-button"
+            onClick={generateReceiptNumber}
+            disabled={generatingNumber}
+          >
+            {generatingNumber ? (
+              <LoaderCircle className="spin" size={15} />
+            ) : (
+              <Check size={15} />
+            )}{" "}
+            {generatingNumber ? "Generating…" : "Generate No. Resi"}
           </Button>
           <Button
             type="button"
