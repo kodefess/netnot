@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const AUTH_COOKIE = "site_auth";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Biarkan lewat: API auth, aset statis Next.js, dan halaman gate itu sendiri
@@ -28,6 +28,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Middleware jalan di semua route KECUALI yang di-exclude di atas
+  // Proxy jalan di semua route KECUALI yang di-exclude di atas
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
