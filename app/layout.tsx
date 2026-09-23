@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { receiptFontVariables, uiFontVariables } from "@/lib/fonts";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "Receipt Studio — receipts with a point of view",
