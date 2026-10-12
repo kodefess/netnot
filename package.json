@@ -8,7 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@base-ui/react": "^1.8.0",
+    "@base-ui/react": "^1.9.0",
     "@upstash/redis": "^1.39.0",
     "@vercel/analytics": "2.0.1",
     "@vercel/kv": "^3.0.0",
@@ -17,7 +17,7 @@
     "cn": "0.3.2",
     "html-to-image": "^1.11.13",
     "lenis": "^1.3.26",
-    "lucide-react": "^1.53.0",
+    "lucide-react": "^1.55.0",
     "next": "16.3.3",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
