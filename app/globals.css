@@ -1,65 +1,113 @@
-@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&display=swap");
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ------------------------------------------------------------------ */
 /* Tokens                                                              */
 /* ------------------------------------------------------------------ */
-/* Palet chrome digroundkan ke subjeknya: kertas nota (warm off-white,
-   bukan cream-terracotta template) dan merah cap tinta/stempel "PAID"
-   sebagai aksen — bukan warna aksen generik. */
+/* Satu warna brand: biru #1337FF. Netral di sekitarnya diberi sedikit
+   rona biru supaya seluruh studio terasa satu keluarga warna. */
 :root {
-  --app-bg: #f3f2ee;
-  --app-ink: #1c1a17;
-  --app-accent: #c1391f;
-  --app-panel: #ffffff;
-  --app-line: rgba(28, 26, 23, 0.1);
-  --app-line-strong: rgba(28, 26, 23, 0.16);
-  --panel: var(--app-panel);
-  --font-signature: "Caveat", cursive;
+  --background: #f4f5fa;
+  --surface: #ffffff;
+  --surface-2: #f3f4fb;
+  --foreground: #0b0e24;
+  --muted-foreground: #626886;
+  --border: rgb(11 14 36 / 0.09);
+  --border-strong: rgb(11 14 36 / 0.16);
+  --brand: #1337ff;
+  --brand-foreground: #ffffff;
+  /* Varian untuk teks/ikon biru di atas latar (kontras aman di dark mode). */
+  --brand-text: #1337ff;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --canvas-dot: rgb(19 55 255 / 0.16);
+  --shadow-panel: 0 1px 2px rgb(11 14 36 / 0.04), 0 8px 24px -12px rgb(11 14 36 / 0.08);
+  color-scheme: light;
 }
 
-* {
-  box-sizing: border-box;
+:root[data-theme="dark"] {
+  --background: #070914;
+  --surface: #0f1220;
+  --surface-2: #151929;
+  --foreground: #eceefb;
+  --muted-foreground: #979dbb;
+  --border: rgb(255 255 255 / 0.08);
+  --border-strong: rgb(255 255 255 / 0.15);
+  --brand: #1337ff;
+  --brand-foreground: #ffffff;
+  --brand-text: #8a9cff;
+  --danger: #f87171;
+  --success: #4ade80;
+  --canvas-dot: rgb(138 156 255 / 0.14);
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+  color-scheme: dark;
 }
 
-/* Lenis css */
+@theme inline {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-instrument-serif), Georgia, serif;
 
-html.lenis,
-html.lenis body {
-  height: auto;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-text: var(--brand-text);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-border-strong: var(--border-strong);
+
+  /* Token yang dipakai komponen shadcn di components/ui. */
+  --color-border: var(--border);
+  --color-input: var(--border-strong);
+  --color-ring: var(--brand);
+  --color-primary: var(--brand);
+  --color-primary-foreground: var(--brand-foreground);
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--surface-2);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--surface-2);
+  --color-accent-foreground: var(--foreground);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--foreground);
+  --color-destructive: var(--danger);
+
+  --radius-md: 8px;
+  --shadow-panel: var(--shadow-panel);
 }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
-html,
-body {
-  background: var(--app-bg);
-  color: var(--app-ink);
-}
-
-body {
-  font-family: var(--font-ui), "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-:focus-visible {
-  outline: 2px solid var(--app-accent);
-  outline-offset: 2px;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 25%, transparent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand-text);
+    outline-offset: 2px;
+  }
+  /* Spinner bawaan input number mengganggu di kolom harga. */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -68,629 +116,96 @@ body {
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Shell                                                                */
-/* ------------------------------------------------------------------ */
-.studio {
-  min-height: 100vh;
-  padding-bottom: 6rem;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.1rem clamp(1.25rem, 4vw, 3rem);
-  background: color-mix(in srgb, var(--app-bg) 88%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--app-line);
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-family: var(--font-display), serif;
-  font-style: italic;
-  font-size: 1.2rem;
-  color: var(--app-ink);
-  text-decoration: none;
-}
-
-.brand-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 8px;
-  background: var(--app-accent);
-  color: #fff;
-  font-family: var(--font-ui), sans-serif;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-.top-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.quiet-button {
-  height: 2.5rem;
-  border-radius: 9px;
-  border-color: var(--app-line-strong);
-  background: transparent;
-  color: var(--app-ink);
-  font-weight: 500;
-  gap: 0.4rem;
-}
-.quiet-button:hover {
-  background: color-mix(in srgb, var(--app-ink) 5%, transparent);
-}
-
-.dark-button {
-  height: 2.5rem;
-  border-radius: 9px;
-  background: var(--app-ink);
-  color: #fff;
-  font-weight: 500;
-  gap: 0.4rem;
-  padding: 0 1rem;
-}
-.dark-button:hover {
-  background: color-mix(in srgb, var(--app-ink) 88%, var(--app-accent));
-}
-
-.spin {
-  animation: spin 0.9s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Hero                                                                 */
-/* ------------------------------------------------------------------ */
-.hero {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 2.5rem;
-  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.25rem, 4vw, 3rem)
-    clamp(2rem, 5vw, 3rem);
-  max-width: 84rem;
-  margin: 0 auto;
-}
-
-.hero-copy-block {
-  max-width: 34rem;
-}
-
-.hero-kicker {
-  margin: 0 0 0.9rem;
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--app-ink) 60%, transparent);
-}
-
-.hero h1 {
-  margin: 0 0 1rem;
-  font-family: var(--font-display), serif;
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-  font-weight: 400;
-}
-
-.hero h1 em {
-  font-style: italic;
-  color: var(--app-accent);
-}
-
-.hero-copy {
-  margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.55;
-  color: color-mix(in srgb, var(--app-ink) 68%, transparent);
-  max-width: 34ch;
-}
-
-.hero-total {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 1.25rem 1.6rem;
-  border-radius: 14px;
-  background: var(--app-panel);
-  border: 1px solid var(--app-line);
-  min-width: 12rem;
-}
-.hero-total span {
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--app-ink) 55%, transparent);
-}
-.hero-total strong {
-  font-family: var(--font-display), serif;
-  font-size: 2.1rem;
-  font-style: italic;
-  line-height: 1;
-}
-.hero-total small {
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--app-ink) 45%, transparent);
-}
-
-/* ------------------------------------------------------------------ */
-/* Workspace                                                            */
-/* ------------------------------------------------------------------ */
-.workspace {
-  max-width: 84rem;
-  margin: 0 auto;
-  padding: 0 clamp(1.25rem, 4vw, 3rem);
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: clamp(1.5rem, 3vw, 2.5rem);
-  align-items: start;
-}
-
-.editor-panel {
-  background: var(--app-panel);
-  border: 1px solid var(--app-line);
-  border-radius: 18px;
-  padding: clamp(1.5rem, 3vw, 2.25rem);
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-}
-
-.preview-panel {
-  position: sticky;
-  top: 6rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
-.preview-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.88rem;
-  color: color-mix(in srgb, var(--app-ink) 60%, transparent);
-  padding: 0 0.2rem;
-}
-.preview-label button {
-  color: var(--app-ink);
-  gap: 0.35rem;
-}
-
-.receipt-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 2.25rem 1.5rem;
-  border-radius: 18px;
-  background: repeating-linear-gradient(
-    135deg,
-    var(--app-line) 0px,
-    var(--app-line) 1px,
-    transparent 1px,
-    transparent 14px
-  );
-  border: 1px solid var(--app-line);
-}
-
-.preview-hint {
-  margin: 0;
-  text-align: center;
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--app-ink) 45%, transparent);
-}
-
-/* ------------------------------------------------------------------ */
-/* Step headings (real sequence: 1 fill in → 2 add items → 3 pick mood) */
-/* ------------------------------------------------------------------ */
-.step-heading {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.9rem;
-}
-
-.step-index {
-  flex-shrink: 0;
-  display: inline-grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent) 12%, transparent);
-  color: var(--app-accent);
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.step-copy {
-  flex: 1;
-  min-width: 0;
-}
-.step-copy h3 {
-  margin: 0.15rem 0 0.2rem;
-  font-size: 1.15rem;
-  font-weight: 600;
-}
-.step-copy p {
-  margin: 0;
-  font-size: 0.88rem;
-  color: color-mix(in srgb, var(--app-ink) 55%, transparent);
-}
-
-.step-meta {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--app-ink) 55%, transparent);
-}
-.step-meta-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: #3fa64c;
-}
-
-/* ------------------------------------------------------------------ */
-/* Field groups                                                         */
-/* ------------------------------------------------------------------ */
-.fields-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding-left: 2.9rem;
-}
-
-.field-group h4 {
-  margin: 0 0 0.75rem;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--app-ink) 50%, transparent);
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--app-line);
-}
-
-.field-group-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.1rem 1rem;
-}
-.field-group-full .field-group-grid {
-  grid-template-columns: 1fr;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  min-width: 0;
-}
-.field label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--app-ink) 78%, transparent);
-}
-.field-hint {
-  margin: 0;
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--app-ink) 45%, transparent);
-}
-.field-logo {
-  grid-column: 1 / -1;
-}
-
-.logo-upload {
-  display: flex;
-}
-.upload-button {
-  height: 2.75rem;
-  border-radius: 9px;
-  border-color: var(--app-line-strong);
-  border-style: dashed;
-  color: color-mix(in srgb, var(--app-ink) 70%, transparent);
-  font-weight: 500;
-  gap: 0.5rem;
-}
-.upload-button:hover {
-  border-color: var(--app-accent);
-  color: var(--app-ink);
-}
-
-.logo-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.4rem 0.6rem 0.4rem 0.4rem;
-  border: 1px solid var(--app-line);
-  border-radius: 9px;
-}
-.logo-actions img {
-  width: 2.1rem;
-  height: 2.1rem;
-  object-fit: cover;
-  border-radius: 6px;
-}
-.logo-actions span {
-  font-size: 0.85rem;
-  color: color-mix(in srgb, var(--app-ink) 65%, transparent);
-  flex: 1;
-}
-
-.currency-option {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.45rem;
-}
-.currency-option small {
-  color: color-mix(in srgb, var(--app-ink) 50%, transparent);
-  font-size: 0.78rem;
-}
-
-/* ------------------------------------------------------------------ */
-/* Line items                                                           */
-/* ------------------------------------------------------------------ */
-.items-editor {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding-left: 2.9rem;
-}
-
-.item-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 8.5rem auto;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.7rem;
-  border: 1px solid var(--app-line);
-  border-radius: 12px;
-}
-
-.item-main {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  min-width: 0;
-}
-.item-main input.sub-input {
-  height: 2.1rem;
-  font-size: 0.82rem;
-  opacity: 0.75;
-}
-
-.qty {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.3rem;
-  border: 1px solid var(--app-line);
-  border-radius: 9px;
-}
-.qty span {
-  min-width: 1.4rem;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  font-size: 0.9rem;
-}
-
-.price-input {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.price-input span {
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--app-ink) 50%, transparent);
-}
-
-.delete-button {
-  color: color-mix(in srgb, var(--app-ink) 40%, transparent);
-}
-.delete-button:hover {
-  color: var(--app-accent);
-}
-
-.add-item {
-  margin-left: 2.9rem;
-  align-self: flex-start;
-  height: 2.5rem;
-  border-radius: 9px;
-  border-color: var(--app-line-strong);
-  border-style: dashed;
-  color: color-mix(in srgb, var(--app-ink) 65%, transparent);
-  gap: 0.4rem;
-}
-.add-item:hover {
-  border-color: var(--app-accent);
-  color: var(--app-ink);
-}
-
-/* ------------------------------------------------------------------ */
-/* Theme picker                                                         */
-/* ------------------------------------------------------------------ */
-.theme-list {
-  padding-left: 2.9rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-}
-
-.theme-option {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.55rem;
-  border: 1px solid var(--app-line);
-  border-radius: 12px;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
-}
-.theme-option:hover {
-  border-color: var(--app-line-strong);
-}
-.theme-option.active {
-  border-color: var(--app-accent);
-  background: color-mix(in srgb, var(--app-accent) 6%, transparent);
-}
-
-.theme-swatch {
-  position: relative;
-  flex-shrink: 0;
-  display: inline-grid;
-  place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 9px;
-  font-size: 1.05rem;
-  border: 1px solid var(--app-line);
-  overflow: hidden;
-}
-.theme-swatch-accent {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-}
-
-.theme-copy {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.theme-copy b {
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-.theme-copy small {
-  font-size: 0.76rem;
-  color: color-mix(in srgb, var(--app-ink) 50%, transparent);
-}
-
-.theme-option svg {
-  margin-left: auto;
-  color: var(--app-accent);
-  flex-shrink: 0;
+/* Kanvas preview: grid titik halus, terasa seperti meja kerja. */
+.canvas {
+  background-color: var(--surface-2);
+  background-image: radial-gradient(var(--canvas-dot) 1px, transparent 1px);
+  background-size: 18px 18px;
 }
 
 /* ------------------------------------------------------------------ */
 /* Receipt                                                              */
 /* ------------------------------------------------------------------ */
+/* Semua warna/tipografi nota dikendalikan CSS variable dari objek tema,
+   jadi tampilan layar, print, dan PNG (html-to-image) selalu sama. */
 .receipt {
-  --receipt-shadow: 0 30px 60px -25px rgba(0, 0, 0, 0.35);
+  --zig: 7px;
+  --pad-x: 1.75rem;
   position: relative;
-  width: min(23rem, 100%);
-  padding: 2.1rem 1.75rem 1.5rem;
-  background: var(--receipt-paper);
+  overflow: hidden;
+  width: 100%;
+  max-width: 23rem;
+  padding: 2.1rem var(--pad-x) calc(1.75rem + var(--zig));
+  background-color: var(--receipt-paper);
   color: var(--receipt-ink);
-  border-radius: var(--receipt-radius);
-  font-family: var(--receipt-font), sans-serif;
-  box-shadow: var(--receipt-shadow);
+  border-radius: var(--receipt-radius) var(--receipt-radius) 0 0;
+  font-family: var(--receipt-font), ui-sans-serif, sans-serif;
+  /* Tepi bawah bergerigi seperti kertas yang disobek dari gulungan. */
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--zig)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
+      bottom / calc(var(--zig) * 2) var(--zig) repeat-x;
+}
+
+.receipt-shadow {
+  filter: drop-shadow(0 22px 28px rgb(0 0 0 / 0.16)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.08));
 }
 
 .receipt-topline {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: 0 0 auto;
   height: 5px;
   background: var(--receipt-accent);
-  border-radius: var(--receipt-radius) var(--receipt-radius) 0 0;
 }
 
-/* Cap "Paid": lingkaran ganda + teks, murni CSS (tanpa gambar atau
-   mix-blend-mode) supaya renderingnya konsisten di layar, print, dan
-   saat di-capture jadi PNG lewat html-to-image. Jarak dari atas dihitung
-   agar duduk di bawah header (mark + tanggal) dan sedikit menindih sudut
-   kanan atas kartu, meniru cara cap tinta sungguhan menimpa dokumen. */
+/* Segel hologram "Paid / Lunas" (lihat components/receipt/paid-seal.tsx).
+   SVG murni, jadi ikut ter-capture html-to-image dan tercetak. Foil biru
+   brand dengan kilau, terbaca di kertas terang maupun gelap. */
 .receipt-stamp {
   position: absolute;
-  top: 4.35rem;
-  right: 1.35rem;
+  /* Di bawah header (logo + tanggal/nomor), sejajar judul toko. */
+  top: 5.3rem;
+  right: 1.1rem;
   z-index: 2;
-  display: inline-grid;
-  place-items: center;
-  width: 5.3rem;
-  height: 5.1rem;
-  border-radius: 49% 51% 52% 48% / 52% 48% 53% 47%;
-  transform: rotate(-13deg);
+  width: 5.75rem;
+  height: 5.75rem;
+  transform: rotate(-12deg);
   pointer-events: none;
-  border: 2.5px solid var(--receipt-accent);
-  box-shadow:
-    inset 0 0 0 3px color-mix(in srgb, var(--receipt-accent) 35%, transparent),
-    inset 0 0 0 5px color-mix(in srgb, var(--receipt-accent) 14%, transparent);
-  background-image:
-    radial-gradient(
-      color-mix(in srgb, var(--receipt-accent) 60%, transparent) 0.55px,
-      transparent 0.6px
-    ),
-    radial-gradient(
-      color-mix(in srgb, var(--receipt-accent) 38%, transparent) 0.5px,
-      transparent 0.55px
-    );
-  background-size:
-    4px 4px,
-    3px 3px;
-  background-position:
-    0 0,
-    1.5px 1.5px;
-  opacity: 0.76;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.18));
 }
-
-@media (max-width: 640px) {
-  .receipt-stamp {
-    width: 4.6rem;
-    height: 4.4rem;
-    top: 3.9rem;
-    right: 1rem;
+.paid-seal {
+  display: block;
+  width: 100%;
+  height: 100%;
+  font-family: var(--receipt-font), ui-sans-serif, sans-serif;
+  /* Foil bergeser tipis biru → ungu → sian, seperti hologram dimiringkan,
+     tapi tetap di keluarga biru brand. */
+  animation: holo-shift 4s ease-in-out infinite alternate;
+}
+.paid-seal-sheen {
+  mix-blend-mode: soft-light;
+}
+@keyframes holo-shift {
+  from {
+    filter: hue-rotate(-12deg) brightness(1);
   }
-  .receipt-stamp::before {
-    inset: -3px;
-  }
-  .receipt-stamp span {
-    font-size: 0.75rem;
+  to {
+    filter: hue-rotate(12deg) brightness(1.1);
   }
 }
 
-/* Cincin hantu — meniru cap yang sedikit meleset saat ditekan ulang */
-.receipt-stamp::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: inherit;
-  border: 1px solid color-mix(in srgb, var(--receipt-accent) 28%, transparent);
-  transform: rotate(5deg);
-}
-
-.receipt-stamp span {
-  font-family: var(--receipt-font), sans-serif;
-  font-weight: var(--receipt-weight);
-  font-size: 0.86rem;
-  letter-spacing: 0.14em;
-  color: var(--receipt-accent);
+.receipt-seal-code {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.45;
 }
 
 .receipt-head {
@@ -708,7 +223,7 @@ body {
   height: 2.5rem;
   border-radius: calc(var(--receipt-radius) * 0.6);
   background: var(--receipt-accent);
-  color: var(--receipt-paper);
+  color: var(--receipt-on-accent);
   font-weight: var(--receipt-weight);
   font-size: 1.1rem;
   overflow: hidden;
@@ -723,39 +238,31 @@ body {
   text-align: right;
   font-size: 0.78rem;
   line-height: 1.5;
-  opacity: 0.7;
 }
-.receipt-date strong {
-  opacity: 1;
+.receipt-date span {
+  opacity: 0.7;
 }
 
 .receipt-intro {
   margin-top: 1.1rem;
+  padding-right: 5.25rem;
 }
-
 .receipt-kicker {
   margin: 0 0 0.2rem;
   font-size: 0.78rem;
   opacity: 0.65;
 }
-
 .receipt-intro h2 {
-  margin: 0 0 0.3rem;
+  margin: 0;
   font-size: 1.7rem;
   font-weight: var(--receipt-weight);
   line-height: 1.1;
-}
-
-.receipt-intro p:last-child {
-  margin: 0;
-  font-size: 0.85rem;
-  opacity: 0.65;
+  overflow-wrap: anywhere;
 }
 
 .receipt-rule {
   margin: 1.1rem 0;
-  border-top: 1.5px dashed
-    color-mix(in srgb, var(--receipt-ink) 22%, transparent);
+  border-top: 1.5px dashed color-mix(in srgb, var(--receipt-ink) 22%, transparent);
 }
 
 .receipt-items {
@@ -763,7 +270,6 @@ body {
   flex-direction: column;
   gap: 0.8rem;
 }
-
 .receipt-item {
   display: flex;
   align-items: flex-start;
@@ -771,25 +277,26 @@ body {
   gap: 1rem;
   font-size: 0.92rem;
 }
-
+.receipt-item > div {
+  min-width: 0;
+}
 .receipt-item strong {
   display: block;
   font-weight: var(--receipt-weight);
+  overflow-wrap: anywhere;
 }
-
 .receipt-item small {
   display: block;
   font-size: 0.76rem;
   opacity: 0.6;
   margin-top: 0.1rem;
 }
-
-.receipt-item span {
+.receipt-item > span {
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
 }
 
-.empty-receipt {
+.receipt-empty {
   margin: 0;
   font-size: 0.85rem;
   opacity: 0.5;
@@ -801,18 +308,16 @@ body {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: 1rem;
 }
-
 .receipt-total span {
   font-size: 0.85rem;
   opacity: 0.7;
 }
-
 .receipt-total small {
-  opacity: 0.6;
+  opacity: 0.75;
   margin-left: 0.3rem;
 }
-
 .receipt-total strong {
   font-size: 1.35rem;
   font-weight: var(--receipt-weight);
@@ -824,337 +329,438 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 0.7rem 0.9rem;
   border-radius: calc(var(--receipt-radius) * 0.5);
   background: color-mix(in srgb, var(--receipt-ink) 6%, transparent);
 }
-
 .receipt-payment div {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
-
 .receipt-payment span {
   font-size: 0.7rem;
   opacity: 0.6;
 }
-
 .receipt-payment strong {
   font-size: 0.88rem;
+  overflow-wrap: anywhere;
 }
-
 .receipt-payment svg {
+  flex-shrink: 0;
   color: var(--receipt-accent);
 }
 
-/* Ucapan terima kasih penutup: pakai font tanda tangan (Caveat) supaya
-   terasa personal dan senada dengan .signature-name, bukan teks sistem. */
 .receipt-thanks {
-  margin: 0.9rem 0 0;
+  margin: 1.4rem 0 0;
   text-align: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  line-height: 1.5;
+  /* Dicampur dengan ink supaya tetap kontras di kertas gelap (Midnight). */
+  color: color-mix(in srgb, var(--receipt-accent) 65%, var(--receipt-ink));
+}
+
+/* ---- Varian karakter tema (theme.caps / boxed / solidRules) ---- */
+.receipt[data-solid-rules] .receipt-rule {
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 16%, transparent);
+}
+
+/* Poster: judul kapital besar & rapat, label kecil ber-tracking lebar. */
+.receipt[data-caps] .receipt-intro h2 {
+  font-size: 2.05rem;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+.receipt[data-caps] .receipt-kicker,
+.receipt[data-caps] .receipt-payment span,
+.receipt[data-caps] .receipt-total > span {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+}
+.receipt[data-caps] .receipt-item strong {
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.receipt[data-caps] .receipt-total strong {
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+}
+
+/* Boxed: total & pembayaran dalam kotak bergaris tegas. */
+.receipt[data-boxed] .receipt-total {
+  padding: 0.85rem 0.9rem;
+  border: 1.5px solid var(--receipt-ink);
+  border-radius: calc(var(--receipt-radius) * 0.5);
+}
+.receipt[data-boxed] .receipt-payment {
+  margin-top: -1.5px;
+  background: transparent;
+  border: 1.5px solid var(--receipt-ink);
+  border-radius: calc(var(--receipt-radius) * 0.5);
+}
+.receipt[data-boxed] .receipt-total + .receipt-payment {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.receipt[data-boxed] .receipt-total:has(+ .receipt-payment) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout nota (theme.layout)                                           */
+/* ------------------------------------------------------------------ */
+
+/* Segel yang mengalir di dalam layout, bukan menempel di pojok. */
+.receipt-stamp.is-inline,
+.receipt-stamp.is-center,
+.receipt-stamp.is-hero {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex-shrink: 0;
+}
+
+/* -- Poster: blok header biru penuh, nama toko besar -- */
+.receipt[data-layout="poster"] {
+  padding-top: 0;
+}
+.receipt-band {
+  margin: 0 calc(var(--pad-x) * -1) 1.4rem;
+  padding: 1.5rem var(--pad-x) 1.75rem;
+  background: var(--receipt-accent);
+  color: var(--receipt-on-accent);
+}
+.receipt-band .receipt-head {
+  margin-top: 0;
+}
+.receipt-band .receipt-mark {
+  background: var(--receipt-on-accent);
   color: var(--receipt-accent);
+}
+.receipt-band .receipt-date span {
   opacity: 0.8;
 }
-
-.receipt-foot {
-  margin-top: 1.2rem;
+.receipt .receipt-band .receipt-intro {
+  margin-top: 2.5rem;
+  padding-right: 0;
+}
+.receipt .receipt-band .receipt-intro h2 {
+  font-size: 2.7rem;
+  line-height: 0.88;
+}
+.receipt-signoff {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  opacity: 0.5;
+  gap: 1rem;
+  margin-top: 1.25rem;
 }
-.receipt-copy {
+.receipt-signoff .receipt-thanks {
+  flex: 1;
+  margin: 0;
+  text-align: left;
+}
+
+/* -- Ticket: struk kasir rata tengah, titik penghubung harga -- */
+.receipt-ticket-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+.receipt-ticket-head h2 {
+  margin: 0.6rem 0 0;
+  font-size: 1.3rem;
+  font-weight: var(--receipt-weight);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+.receipt-ticket-head .receipt-kicker {
+  margin: 0;
+}
+.receipt-ticket-meta {
+  margin: 0;
+  font-size: 0.74rem;
+  opacity: 0.7;
+}
+.receipt[data-layout="ticket"] .receipt-items {
+  gap: 0.55rem;
+}
+.receipt-ticket-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+.receipt-ticket-line + .receipt-ticket-line {
+  margin-top: 0.5rem;
+}
+.receipt-ticket-line > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.receipt-ticket-line > span:last-child {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.receipt-ticket-line i {
+  flex: 1;
+  min-width: 1rem;
+  border-bottom: 1.5px dotted color-mix(in srgb, var(--receipt-ink) 45%, transparent);
+  transform: translateY(-0.25em);
+}
+.receipt-ticket-line.is-total {
+  font-size: 1.05rem;
+  font-weight: var(--receipt-weight);
+}
+.receipt-stamp.is-center {
+  margin: 1.4rem auto 0;
+  transform: rotate(-8deg);
+}
+.receipt-barcode {
+  display: block;
+  width: 100%;
+  height: 2.6rem;
+  margin-top: 1.25rem;
+}
+
+/* -- Table: info berbingkai + tabel berkolom -- */
+.receipt[data-layout="table"] .receipt-intro {
+  margin-top: 0.9rem;
+}
+.receipt-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 1.25rem 0 0;
+  border: 1.5px solid var(--receipt-ink);
+  border-radius: calc(var(--receipt-radius) * 0.5);
+}
+.receipt-info > div {
+  min-width: 0;
+  padding: 0.55rem 0.6rem;
+}
+.receipt-info > div + div {
+  border-left: 1.5px solid var(--receipt-ink);
+}
+.receipt-info dt {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.receipt-info dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.76rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.receipt-table {
+  margin-top: 1.1rem;
+  font-size: 0.82rem;
+}
+.receipt-table-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2rem 6.25rem;
+  gap: 0.5rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--receipt-ink) 16%, transparent);
+}
+.receipt-table-row > span:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.receipt-table-row strong {
+  display: block;
+  font-weight: var(--receipt-weight);
+  overflow-wrap: anywhere;
+}
+.receipt-table-row small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
   opacity: 0.6;
 }
-.receipt-copy:hover {
-  opacity: 1;
+.receipt-table-row.is-head {
+  padding-top: 0;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1.5px solid var(--receipt-ink);
+}
+.receipt-table-row.is-head > span {
+  opacity: 0.7;
+}
+.receipt-table-row.is-foot {
+  margin-top: -1px;
+  padding-top: 0.75rem;
+  border-top: 1.5px solid var(--receipt-ink);
+  border-bottom: none;
+  font-size: 1.02rem;
+  font-weight: var(--receipt-weight);
 }
 
-.tear-line {
+/* -- Wallet: ala aplikasi pembayaran, nominal besar di atas -- */
+.receipt[data-layout="wallet"] {
+  padding-top: 1.75rem;
+  text-align: center;
+}
+.receipt-stamp.is-hero {
+  width: 6.5rem;
+  height: 6.5rem;
+  margin: 0 auto 0.75rem;
+  transform: rotate(-6deg);
+}
+.receipt-wallet-kicker {
+  margin: 0;
+}
+.receipt-wallet-amount {
+  margin: 0.15rem 0 0;
+  font-size: 2.3rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.receipt-wallet-to {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.3rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--receipt-ink) 6%, transparent);
+  font-size: 0.82rem;
+}
+.receipt-wallet-to .receipt-mark {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+.receipt-wallet-to span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.receipt-wallet-details {
+  margin: 1.25rem 0 1.1rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: calc(var(--receipt-radius) * 0.6);
+  background: color-mix(in srgb, var(--receipt-ink) 5%, transparent);
+  text-align: left;
+}
+.receipt-wallet-details > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+}
+.receipt-wallet-details > div + div {
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 10%, transparent);
+}
+.receipt-wallet-details dt {
+  opacity: 0.6;
+}
+.receipt-wallet-details dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.receipt[data-layout="wallet"] .receipt-items {
+  text-align: left;
+}
+
+/* -- Margin: pita biru vertikal dengan nama toko diputar -- */
+.receipt[data-layout="margin"] {
+  padding-left: calc(var(--pad-x) + 2.75rem);
+}
+.receipt-spine {
   position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 12px;
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--receipt-paper) 0 6px,
-    transparent 6px 12px
-  );
-  mask: radial-gradient(circle 6px at 6px 0, transparent 98%, black 100%)
-    repeat-x;
-  mask-size: 12px 12px;
+  inset: 0 auto 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 2.75rem;
+  padding: 1.5rem 0 calc(1.5rem + var(--zig));
+  background: var(--receipt-accent);
+  color: var(--receipt-on-accent);
+}
+.receipt-spine span {
+  max-height: 100%;
+  overflow: hidden;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 1.05rem;
+  font-weight: var(--receipt-weight);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-/* ---- Receipt background patterns, keyed to theme.pattern ---- */
+/* ---- Pola latar kertas, sesuai theme.pattern ---- */
 .pattern-dots {
-  background-image: radial-gradient(
-    color-mix(in srgb, var(--receipt-ink) 12%, transparent) 1.2px,
-    transparent 1.2px
-  );
+  background-image: radial-gradient(color-mix(in srgb, var(--receipt-ink) 12%, transparent) 1.2px, transparent 1.2px);
   background-size: 14px 14px;
 }
 .pattern-grid {
   background-image:
-    linear-gradient(
-      color-mix(in srgb, var(--receipt-ink) 7%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--receipt-ink) 7%, transparent) 1px,
-      transparent 1px
-    );
+    linear-gradient(color-mix(in srgb, var(--receipt-ink) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--receipt-ink) 9%, transparent) 1px, transparent 1px);
   background-size: 16px 16px;
 }
-.pattern-lines {
-  background-image: repeating-linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--receipt-ink) 6%, transparent) 0,
-    color-mix(in srgb, var(--receipt-ink) 6%, transparent) 1px,
-    transparent 1px,
-    transparent 26px
-  );
-}
-.pattern-halftone {
-  background-image: radial-gradient(
-    color-mix(in srgb, var(--receipt-ink) 18%, transparent) 1px,
-    transparent 1px
-  );
-  background-size: 6px 6px;
-}
-.pattern-confetti {
-  background-image:
-    radial-gradient(
-      color-mix(in srgb, var(--receipt-accent) 45%, transparent) 2px,
-      transparent 2px
-    ),
-    radial-gradient(
-      color-mix(in srgb, var(--receipt-ink) 15%, transparent) 1.5px,
-      transparent 1.5px
-    );
-  background-size:
-    22px 22px,
-    15px 15px;
-  background-position:
-    0 0,
-    8px 10px;
-}
 
-/* ------------------------------------------------------------------ */
-/* Responsive                                                           */
-/* ------------------------------------------------------------------ */
-@media (max-width: 960px) {
-  .workspace {
-    grid-template-columns: 1fr;
-  }
-  .preview-panel {
-    position: static;
-    order: -1;
-  }
-  .hero {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 640px) {
-  .topbar {
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-  .top-actions {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-  .field-group-grid {
-    grid-template-columns: 1fr;
-  }
-  .fields-stack,
-  .items-editor,
-  .theme-list,
-  .add-item {
-    padding-left: 0;
-    margin-left: 0;
-  }
-  .item-row {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-  }
-  .theme-list {
-    grid-template-columns: 1fr;
+@media (max-width: 400px) {
+  .receipt {
+    --pad-x: 1.25rem;
   }
   .receipt-stamp {
-    width: 4.4rem;
-    height: 4.4rem;
-    top: 3.9rem;
-    right: 1rem;
+    width: 4.8rem;
+    height: 4.8rem;
+    right: 0.75rem;
   }
-  .receipt-stamp span {
-    font-size: 0.78rem;
+}
+
+/* Saat print, hentikan animasi supaya warna foil konsisten. */
+@media print {
+  .paid-seal {
+    animation: none;
   }
 }
 
 /* ------------------------------------------------------------------ */
-/* Print                                                                */
+/* Print: hanya notanya yang dicetak                                    */
 /* ------------------------------------------------------------------ */
 @media print {
-  .topbar,
-  .hero,
-  .editor-panel,
-  .preview-label,
-  .preview-hint,
-  .receipt-copy {
-    display: none !important;
+  @page {
+    margin: 12mm;
   }
-  .studio {
-    padding: 0;
-    background: #fff;
+  html,
+  body {
+    background: #fff !important;
   }
-  .workspace {
-    display: block;
-    padding: 0;
-    max-width: none;
+  body * {
+    visibility: hidden;
   }
-  .receipt-wrap {
-    padding: 0;
-    background: none;
-    border: none;
+  #receipt-print,
+  #receipt-print * {
+    visibility: visible;
   }
-  .receipt {
-    box-shadow: none;
-    width: 100%;
+  #receipt-print {
+    position: absolute;
+    inset: 0 0 auto;
     margin: 0 auto;
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Signature                                                           */
-/* ------------------------------------------------------------------ */
-.receipt-signature {
-  margin-top: 1.5rem;
-  padding-top: 0.35rem;
-  text-align: right;
-}
-
-.signature-name {
-  display: inline-block;
-  margin: 0;
-  padding: 0 0.35rem;
-  font-family: var(--font-signature), cursive;
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  color: var(--receipt-ink);
-  transform: rotate(-4deg);
-  transform-origin: right center;
-  /* sedikit membuat tinta terasa lebih natural */
-  opacity: 0.88;
-}
-
-.signature-foot {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.55rem;
-  margin-top: 0.45rem;
-}
-
-.signature-line {
-  width: 5.5rem;
-  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 25%, transparent);
-}
-
-.signature-caption {
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--receipt-ink) 45%, transparent);
-  white-space: nowrap;
-}
-
-/* ------------------------------------------------------------------ */
-/* Footer                                                               */
-/* ------------------------------------------------------------------ */
-.app-footer {
-  max-width: 84rem;
-  margin: 4rem auto 0;
-  padding: 0 clamp(1.25rem, 4vw, 3rem);
-}
-
-.footer-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  padding-bottom: 1.5rem;
-}
-
-.footer-brand {
-  font-size: 1.05rem;
-}
-
-.footer-links {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-.footer-links a {
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--app-ink) 65%, transparent);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-.footer-links a:hover {
-  color: var(--app-ink);
-}
-
-.footer-rule {
-  border-top: 1px solid var(--app-line);
-}
-
-.footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 1.25rem 0 2.5rem;
-  font-size: 0.8rem;
-  color: color-mix(in srgb, var(--app-ink) 50%, transparent);
-}
-
-.footer-bottom p {
-  margin: 0;
-}
-
-.footer-made {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.footer-made svg {
-  color: var(--app-accent);
-}
-
-@media (max-width: 640px) {
-  .footer-top,
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media print {
-  .app-footer {
-    display: none !important;
+    filter: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

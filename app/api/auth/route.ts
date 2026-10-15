@@ -1,49 +1,67 @@
-import { NextResponse } from "next/server";
+import { createHash, timingSafeEqual } from "node:crypto";
+import { type NextRequest, NextResponse } from "next/server";
 
-const AUTH_COOKIE = "site_auth";
+import { AUTH_COOKIE, AUTH_COOKIE_VALUE } from "@/lib/auth";
+
 const ATTEMPTS_COOKIE = "auth_attempts";
 const MAX_ATTEMPTS = 3;
+const LOCK_SECONDS = 60 * 10;
 
-export async function POST(request: Request) {
-  const { password } = await request.json();
-  const correctPassword = process.env.SITE_PASSWORD;
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+};
 
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const attemptsMatch = cookieHeader.match(
-    new RegExp(`${ATTEMPTS_COOKIE}=(\\d+)`),
+// Bandingkan hash supaya panjang buffer selalu sama dan perbandingannya
+// constant-time (tidak membocorkan info lewat timing).
+const safeEqual = (a: string, b: string) =>
+  timingSafeEqual(
+    createHash("sha256").update(a).digest(),
+    createHash("sha256").update(b).digest(),
   );
-  const currentAttempts = attemptsMatch ? parseInt(attemptsMatch[1], 10) : 0;
 
-  // Password benar
-  if (password && password === correctPassword) {
+export async function POST(request: NextRequest) {
+  const correctPassword = process.env.SITE_PASSWORD;
+  if (!correctPassword) {
+    console.error("SITE_PASSWORD is not configured");
+    return NextResponse.json({ error: "Server is not configured" }, { status: 500 });
+  }
+
+  const attempts = Number(request.cookies.get(ATTEMPTS_COOKIE)?.value) || 0;
+
+  // Kunci ditegakkan di server: setelah batas tercapai, password benar pun
+  // ditolak sampai cookie percobaan kedaluwarsa.
+  if (attempts >= MAX_ATTEMPTS) {
+    return NextResponse.json(
+      { success: false, locked: true, attemptsLeft: 0 },
+      { status: 429 },
+    );
+  }
+
+  const body = await request.json().catch(() => null);
+  const password = typeof body?.password === "string" ? body.password : "";
+
+  if (password && safeEqual(password, correctPassword)) {
     const response = NextResponse.json({ success: true });
-    response.cookies.set(AUTH_COOKIE, "granted", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
+    response.cookies.set(AUTH_COOKIE, AUTH_COOKIE_VALUE, {
+      ...cookieOptions,
       maxAge: 60 * 60 * 24 * 7, // sesi login bertahan 7 hari
     });
     response.cookies.delete(ATTEMPTS_COOKIE);
     return response;
   }
 
-  // Password salah
-  const newAttempts = currentAttempts + 1;
+  const newAttempts = attempts + 1;
   const locked = newAttempts >= MAX_ATTEMPTS;
-
-  const response = NextResponse.json({
-    success: false,
-    attemptsLeft: Math.max(0, MAX_ATTEMPTS - newAttempts),
-    locked,
-  });
+  const response = NextResponse.json(
+    { success: false, locked, attemptsLeft: Math.max(0, MAX_ATTEMPTS - newAttempts) },
+    { status: locked ? 429 : 401 },
+  );
   response.cookies.set(ATTEMPTS_COOKIE, String(newAttempts), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 10, // reset percobaan setelah 10 menit
+    ...cookieOptions,
+    maxAge: LOCK_SECONDS,
   });
-
   return response;
 }

@@ -1,0 +1,196 @@
+"use client";
+
+import { Check, Palette, Shuffle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Section } from "@/components/studio/section";
+import type { ReceiptStore } from "@/hooks/use-receipt";
+import { type Theme, randomTheme, themes } from "@/lib/themes";
+import { cn } from "@/lib/utils";
+
+export function StyleSection({ receipt }: { receipt: ReceiptStore }) {
+  const { theme, set } = receipt;
+
+  return (
+    <Section
+      icon={Palette}
+      title="Style"
+      description="All in brand blue — each style has its own layout and typeface."
+      actions={
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => set("themeId", randomTheme(theme.id).id)}
+          className="h-8 gap-1.5 px-2.5 text-[13px] text-muted-foreground hover:text-foreground"
+        >
+          <Shuffle className="size-3.5" /> Surprise me
+        </Button>
+      }
+    >
+      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+        {themes.map((t) => (
+          <ThemeTile
+            key={t.id}
+            theme={t}
+            active={t.id === theme.id}
+            onSelect={() => set("themeId", t.id)}
+          />
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function ThemeTile({
+  theme,
+  active,
+  onSelect,
+}: {
+  theme: Theme;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={active}
+      onClick={onSelect}
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-xl border bg-surface text-left transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-panel",
+        active && "border-brand ring-2 ring-brand/25 hover:border-brand",
+      )}
+    >
+      {/* Mini nota: semua tema biru, jadi yang ditonjolkan adalah susunan
+          (layout) dan typeface-nya. */}
+      <span
+        className={cn("relative block h-24 overflow-hidden", `pattern-${theme.pattern}`)}
+        style={
+          {
+            "--receipt-ink": theme.ink,
+            backgroundColor: theme.paper,
+            color: theme.ink,
+          } as React.CSSProperties
+        }
+      >
+        <LayoutSketch theme={theme} />
+        {active && (
+          <span className="absolute top-2.5 right-2 grid size-5 place-items-center rounded-full bg-brand text-brand-foreground">
+            <Check className="size-3" strokeWidth={3} />
+          </span>
+        )}
+      </span>
+      <span className="block border-t px-3 py-2">
+        <span className="block text-[13px] font-semibold">{theme.name}</span>
+        <span className="block truncate text-xs text-muted-foreground">{theme.vibe}</span>
+      </span>
+    </button>
+  );
+}
+
+/** Sketsa kecil susunan nota per layout, memakai font asli tema. */
+function LayoutSketch({ theme }: { theme: Theme }) {
+  const { ink, accent, onAccent, font, weight, layout, caps } = theme;
+  const type = (size: string, color = ink) => ({
+    fontFamily: font,
+    fontWeight: weight,
+    fontSize: size,
+    color,
+    textTransform: caps ? ("uppercase" as const) : undefined,
+    lineHeight: 1,
+  });
+  const line = (w: string, o = 0.3, color = ink) => (
+    <span className="block h-1 rounded-full" style={{ width: w, background: color, opacity: o }} />
+  );
+  const lines = (
+    <span className="flex flex-col gap-1.5">
+      <span className="flex justify-between">{line("55%")}{line("20%")}</span>
+      <span className="flex justify-between">{line("40%")}{line("25%", 0.6)}</span>
+    </span>
+  );
+
+  switch (layout) {
+    case "poster":
+      return (
+        <>
+          <span className="block px-3 pt-2.5 pb-2" style={{ background: accent }}>
+            <span className="block text-[22px] tracking-tight" style={type("22px", onAccent)}>
+              Aa
+            </span>
+          </span>
+          <span className="block px-3 pt-2.5">{lines}</span>
+        </>
+      );
+    case "ticket":
+      return (
+        <span className="flex flex-col items-center gap-1.5 px-3 pt-3">
+          <span style={type("15px")}>Aa</span>
+          <span className="flex w-full items-end gap-1">
+            {line("30%")}
+            <span className="mb-px flex-1 border-b border-dotted" style={{ borderColor: ink, opacity: 0.5 }} />
+            {line("18%", 0.6)}
+          </span>
+          <span className="flex h-3.5 w-3/4 gap-[2px]" style={{ opacity: 0.8 }}>
+            {[2, 1, 3, 1, 2, 1, 1, 3, 2, 1, 2, 3, 1, 2].map((w, i) => (
+              <span key={i} style={{ width: w, background: ink }} />
+            ))}
+          </span>
+        </span>
+      );
+    case "table":
+      return (
+        <span className="block px-3 pt-3">
+          <span className="block" style={type("18px")}>Aa</span>
+          <span className="mt-2 grid grid-cols-3 border" style={{ borderColor: ink }}>
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="block h-3"
+                style={{ borderLeft: i ? `1px solid ${ink}` : undefined }}
+              />
+            ))}
+          </span>
+          <span className="mt-1.5 block border-b pb-1" style={{ borderColor: ink }}>
+            {line("60%")}
+          </span>
+        </span>
+      );
+    case "wallet":
+      return (
+        <span className="flex flex-col items-center gap-1 px-3 pt-2.5">
+          <span
+            className="block size-6 rounded-full"
+            style={{ background: "conic-gradient(#1337ff, #b9c6ff, #1337ff, #dfe6ff, #1337ff)" }}
+          />
+          <span style={type("17px")}>50.000</span>
+          {line("45%", 0.2)}
+        </span>
+      );
+    case "margin":
+      return (
+        <span className="flex h-full">
+          <span className="flex w-5 items-end justify-center pb-2" style={{ background: accent }}>
+            <span
+              className="block"
+              style={{ ...type("10px", onAccent), writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+            >
+              Aa
+            </span>
+          </span>
+          <span className="block flex-1 px-3 pt-3">
+            <span className="block" style={type("18px")}>Aa</span>
+            <span className="mt-2 block">{lines}</span>
+          </span>
+        </span>
+      );
+    default:
+      return (
+        <span className="block px-3 pt-3">
+          <span className="absolute inset-x-0 top-0 h-1" style={{ background: accent }} />
+          <span className="block" style={type("22px")}>Aa</span>
+          <span className="mt-2.5 block">{lines}</span>
+        </span>
+      );
+  }
+}
