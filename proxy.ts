@@ -1,33 +1,29 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-const AUTH_COOKIE = "site_auth";
+import { AUTH_COOKIE, AUTH_COOKIE_VALUE } from "@/lib/auth";
+
+const PUBLIC_PATHS = ["/gate", "/api/auth"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Biarkan lewat: API auth, aset statis Next.js, dan halaman gate itu sendiri
-  if (
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/_next") ||
-    pathname === "/gate" ||
-    pathname === "/favicon.ico"
-  ) {
+  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     return NextResponse.next();
   }
 
-  const isAuthed = request.cookies.get(AUTH_COOKIE)?.value === "granted";
-
-  if (!isAuthed) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/gate";
-    return NextResponse.rewrite(url); // rewrite, bukan redirect, jadi URL di address bar tetap sama
+  if (request.cookies.get(AUTH_COOKIE)?.value === AUTH_COOKIE_VALUE) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // API dapat 401 JSON, halaman di-rewrite ke /gate (URL di address bar tetap).
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const url = request.nextUrl.clone();
+  url.pathname = "/gate";
+  return NextResponse.rewrite(url);
 }
 
 export const config = {
-  // Proxy jalan di semua route KECUALI yang di-exclude di atas
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Lewati aset statis Next.js dan file di /public (punya ekstensi).
+  matcher: ["/((?!_next/static|_next/image|.*\\.[\\w]+$).*)"],
 };

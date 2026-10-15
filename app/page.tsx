@@ -1,560 +1,140 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
-import { toPng } from "html-to-image";
-import {
-  Check,
-  Download,
-  LoaderCircle,
-  Minus,
-  Plus,
-  Printer,
-  RotateCcw,
-  Share2,
-  Trash2,
-  Upload,
-  X,
-} from "lucide-react";
+import { Download, Eye, LoaderCircle, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { Theme, themes } from "@/lib/themes";
-import {
-  DEFAULT_DATE_PLACEHOLDER,
-  Item,
-  currencies,
-  getJakartaDate,
-  initialItems,
-  isoToFlag,
-  money,
-  pickThankYou,
-  thankYouMessages,
-} from "@/lib/receipt-utils";
-import {
-  Field,
-  FieldGroup,
-  StepHeading,
-  controlClass,
-} from "@/components/receipt/receipt-fields";
-import { Receipt } from "@/components/receipt/receipt-preview";
-import Footer from "@/components/footer";
+import { ColorSchemeToggle } from "@/components/color-scheme-toggle";
+import { ToastProvider, useToast } from "@/components/toast";
+import { DetailsSection } from "@/components/studio/details-section";
+import { ItemsSection } from "@/components/studio/items-section";
+import { PreviewPanel } from "@/components/studio/preview-panel";
+import { StyleSection } from "@/components/studio/style-section";
+import { type ReceiptStore, useReceipt } from "@/hooks/use-receipt";
+import { useReceiptExport } from "@/hooks/use-receipt-export";
+import { money } from "@/lib/receipt-utils";
+import { SITE } from "@/lib/site";
 
 export default function Page() {
-  const [store, setStore] = useState("Mezo Store (JOYCO)"),
-    [title, setTitle] = useState("Payment receipt"),
-    [order, setOrder] = useState("4829"),
-    // Placeholder statis dulu; diganti ke tanggal Asia/Jakarta yang
-    // sebenarnya di useEffect supaya render pertama server & client
-    // tetap identik (hindari hydration mismatch).
-    [date, setDate] = useState(DEFAULT_DATE_PLACEHOLDER),
-    [payment, setPayment] = useState("QRIS Mezo Store"),
-    [currency, setCurrency] = useState("IDR"),
-    [theme, setTheme] = useState(themes[3]),
-    [thanks, setThanks] = useState<[string, string]>(thankYouMessages[0]),
-    [logo, setLogo] = useState(""),
-    [copied, setCopied] = useState(false),
-    [items, setItems] = useState<Item[]>(initialItems);
-  const [generatingNumber, setGeneratingNumber] = useState(false); // ← TAMBAHKAN INI
+  return (
+    <ToastProvider>
+      <Studio />
+    </ToastProvider>
+  );
+}
 
-  const handleCurrencyChange = (value: string | null) => {
-    setCurrency(value ?? "IDR");
-  };
-  const fileRef = useRef<HTMLInputElement>(null),
-    receiptRef = useRef<HTMLElement>(null),
-    total = useMemo(
-      () => items.reduce((s, i) => s + i.qty * i.price, 0),
-      [items],
-    );
-  const [downloading, setDownloading] = useState(false);
+function Studio() {
+  const receipt = useReceipt();
+  const exporter = useReceiptExport(receipt.draft);
+  const { draft, totals } = receipt;
 
-  // Pilih tema, ucapan terima kasih, dan tanggal (Asia/Jakarta) secara
-  // acak/aktual setiap kali halaman di-refresh, dilakukan di useEffect
-  // (bukan langsung di useState) supaya render pertama server & client
-  // tetap identik dan tidak memicu hydration mismatch.
-  useEffect(() => {
-    const random = themes[Math.floor(Math.random() * themes.length)];
-    setTheme(random);
-    setThanks(pickThankYou());
-    setDate(getJakartaDate());
-  }, []);
+  return (
+    <div className="min-h-dvh pb-24 lg:pb-0">
+      <SiteHeader receipt={receipt} />
 
-  const updateItem = (id: number, key: keyof Item, value: string | number) =>
-    setItems((current) =>
-      current.map((i) => (i.id === id ? { ...i, [key]: value } : i)),
-    );
-  const handleLogo = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/") || file.size > 2_000_000) {
-      alert("Please choose an image under 2MB.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => setLogo(String(reader.result));
-    reader.readAsDataURL(file);
-  };
+      <main className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_26rem] lg:gap-8 lg:px-8 lg:py-8 xl:grid-cols-[minmax(0,1fr)_28rem]">
+        <div className="flex min-w-0 flex-col gap-6">
+          <div className="px-1">
+            <h1 className="font-display text-3xl leading-tight tracking-tight sm:text-4xl">
+              Receipts that look like <em className="text-brand-text">your</em> brand.
+            </h1>
+            <p className="mt-2 max-w-xl text-[15px] text-muted-foreground">
+              Fill in the details and pick a style — the preview updates as you type and your
+              draft is saved in this browser automatically.
+            </p>
+          </div>
+          <DetailsSection receipt={receipt} />
+          <ItemsSection receipt={receipt} />
+          <StyleSection receipt={receipt} />
+          <footer className="px-1 pb-4 text-xs text-muted-foreground">
+            © {new Date().getFullYear()} {SITE.title}. Made for people who like their receipts
+            pretty.
+          </footer>
+        </div>
+
+        <aside className="lg:sticky lg:top-20 lg:self-start">
+          <PreviewPanel receipt={receipt} exporter={exporter} />
+        </aside>
+      </main>
+
+      {/* Bar bawah khusus mobile: total selalu terlihat + aksi utama. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-surface/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:hidden">
+        <div className="mx-auto flex max-w-xl items-center gap-2">
+          <div className="mr-auto min-w-0">
+            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="truncate font-mono text-base font-semibold tabular-nums">
+              {money(totals.total, draft.currency)}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="h-10 gap-1.5 rounded-lg border-input bg-surface px-3"
+            onClick={() => document.getElementById("preview")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <Eye className="size-4" /> Preview
+          </Button>
+          <Button
+            onClick={exporter.download}
+            disabled={exporter.downloading}
+            className="h-10 gap-1.5 rounded-lg bg-brand px-3 text-brand-foreground hover:bg-brand/90"
+          >
+            {exporter.downloading ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <Download className="size-4" />
+            )}
+            Save
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
+  const toast = useToast();
+
   const reset = () => {
-    setStore("Mezo Store (JOYCO)");
-    setTitle("Payment receipt");
-    setOrder("4829");
-    setDate(getJakartaDate()); // kembali ke tanggal hari ini (Asia/Jakarta)
-    setPayment("QRIS Mezo Store");
-    setCurrency("IDR");
-    setItems(initialItems);
-    setTheme(themes[3]);
-    setThanks(pickThankYou());
-    setLogo("");
-  };
-  const copy = async () => {
-    await navigator.clipboard?.writeText(
-      `${store} — ${money(total, currency)} — ${payment}`,
-    );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  };
-
-  const generateReceiptNumber = async () => {
-    if (generatingNumber) return;
-    setGeneratingNumber(true);
-    try {
-      const res = await fetch("/api/receipt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ store, title, payment, currency, items, total }),
-      });
-
-      if (!res.ok) {
-        console.error("Failed to generate receipt number");
-        alert("Gagal membuat nomor resi. Coba lagi.");
-        return;
-      }
-
-      const data = await res.json();
-      setOrder(data.receiptNumber); // "J-004", timpa field order otomatis
-    } catch (error) {
-      console.error("Error generating receipt number", error);
-      alert("Terjadi kesalahan saat membuat nomor resi.");
-    } finally {
-      setGeneratingNumber(false);
-    }
-  };
-
-  // Menunggu dua animation frame supaya browser benar-benar selesai
-  // melayout & mengecat sebelum di-capture, mencegah hasil terpotong.
-  const nextPaint = () =>
-    new Promise<void>((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-    );
-
-  const downloadImage = async () => {
-    if (!receiptRef.current || downloading) return;
-    setDownloading(true);
-    const node = receiptRef.current;
-
-    try {
-      if (document.fonts?.ready) await document.fonts.ready;
-      await nextPaint();
-
-      const { width, height } = node.getBoundingClientRect();
-      const dataUrl = await toPng(node, {
-        width: Math.ceil(width),
-        height: Math.ceil(height),
-        pixelRatio: 3,
-        cacheBust: true,
-        backgroundColor: theme.paper,
-        style: { margin: "0", boxShadow: "none", transform: "none" },
-        filter: (element) => !element.classList?.contains("receipt-copy"),
-      });
-
-      const link = document.createElement("a");
-      link.download = `${(store || "receipt").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-receipt.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
-      console.error("Failed to generate receipt image", error);
-      alert("Gagal membuat gambar nota. Coba lagi sebentar lagi.");
-    } finally {
-      setDownloading(false);
-    }
+    const previous = receipt.draft;
+    receipt.reset();
+    toast({
+      message: "Started a fresh receipt.",
+      action: { label: "Undo", onClick: () => receipt.restore(previous) },
+    });
   };
 
   return (
-    <>
-      <main
-        className="studio"
-        style={
-          {
-            "--accent": theme.accent,
-            "--ink": theme.ink,
-            "--control-radius": theme.shape === "0px" ? "3px" : theme.shape,
-          } as React.CSSProperties
-        }
-      >
-        <nav className="topbar">
-          <a className="brand" href="#">
-            <span className="brand-icon">r</span> Receipt studio
-          </a>
-          <div className="top-actions">
-            <Button
-              type="button"
-              variant="outline"
-              className="quiet-button"
-              onClick={reset}
-            >
-              <RotateCcw size={15} /> Reset
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="quiet-button"
-              onClick={generateReceiptNumber}
-              disabled={generatingNumber}
-            >
-              {generatingNumber ? (
-                <LoaderCircle className="spin" size={15} />
-              ) : (
-                <Check size={15} />
-              )}{" "}
-              {generatingNumber ? "Generating…" : "Generate No. Resi"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="quiet-button export-button"
-              onClick={downloadImage}
-              disabled={downloading}
-            >
-              {downloading ? (
-                <LoaderCircle className="spin" size={15} />
-              ) : (
-                <Download size={15} />
-              )}{" "}
-              {downloading ? "Making image…" : "Download image"}
-            </Button>
-            <Button
-              type="button"
-              className="dark-button"
-              onClick={() => window.print()}
-            >
-              <Printer size={15} /> Print / PDF
-            </Button>
-          </div>
-        </nav>
+    <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+        <a href="/" className="mr-auto flex items-center gap-2.5">
+          <span className="grid size-8 place-items-center rounded-lg bg-brand text-brand-foreground">
+            <ReceiptGlyph />
+          </span>
+          <span className="font-display text-xl italic">{SITE.title}</span>
+        </a>
+        <Button
+          variant="ghost"
+          onClick={reset}
+          className="h-9 gap-1.5 rounded-full px-3 text-muted-foreground hover:text-foreground"
+        >
+          <RotateCcw className="size-4" />
+          <span className="hidden sm:inline">New receipt</span>
+        </Button>
+        <ColorSchemeToggle />
+      </div>
+    </header>
+  );
+}
 
-        <section className="hero">
-          <div className="hero-copy-block">
-            <p className="hero-kicker">Free receipt generator</p>
-            <h1>
-              Receipts that actually <em>look</em> like your brand.
-            </h1>
-            <p className="hero-copy">
-              Fill in the details, drop your logo in, and pick a mood — the
-              preview updates as you type, so what you see is what gets printed.
-            </p>
-          </div>
-          <div className="hero-total">
-            <span>Current total</span>
-            <strong>{money(total, currency)}</strong>
-            <small>{items.length} line items</small>
-          </div>
-        </section>
-
-        <div className="workspace">
-          <section className="editor-panel">
-            <StepHeading
-              index={1}
-              title="Make it yours"
-              description="Set the identity, order info, and a short note."
-              meta="Live preview"
-            />
-
-            <div className="fields-stack">
-              <FieldGroup title="Identity">
-                <Field
-                  id="store-name"
-                  label="Store name"
-                  value={store}
-                  onChange={setStore}
-                />
-                <Field
-                  id="receipt-title"
-                  label="Receipt title"
-                  value={title}
-                  onChange={setTitle}
-                />
-
-                <div className="field field-logo">
-                  <Label>Store logo</Label>
-                  <div className="logo-upload">
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      onChange={handleLogo}
-                      hidden
-                    />
-                    {logo ? (
-                      <div className="logo-actions">
-                        <img src={logo} alt="Uploaded logo preview" />
-                        <span>Logo ready for print.</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setLogo("")}
-                          aria-label="Remove logo"
-                        >
-                          <X size={14} />
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="upload-button"
-                        onClick={() => fileRef.current?.click()}
-                      >
-                        <Upload size={15} /> Upload a square image
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </FieldGroup>
-
-              <FieldGroup title="Order & payment">
-                <Field
-                  id="order-number"
-                  label="Order number"
-                  value={order}
-                  onChange={setOrder}
-                />
-                <Field
-                  id="receipt-date"
-                  label="Date"
-                  value={date}
-                  onChange={setDate}
-                />
-                <Field
-                  id="payment-method"
-                  label="Payment method"
-                  value={payment}
-                  onChange={setPayment}
-                />
-
-                <div className="field">
-                  <Label htmlFor="currency">Currency</Label>
-                  <Select value={currency} onValueChange={handleCurrencyChange}>
-                    <SelectTrigger
-                      id="currency"
-                      aria-label="Currency"
-                      className={cn(controlClass, "justify-between")}
-                    >
-                      <SelectValue placeholder="Choose a currency" />
-                    </SelectTrigger>
-                    <SelectContent className="border-[color:var(--ink)]/14 bg-[color:var(--panel)] text-[color:var(--ink)]">
-                      {currencies.map((item) => (
-                        <SelectItem
-                          key={item.code}
-                          value={item.code}
-                          className="focus:bg-[color:var(--accent)]/15 focus:text-[color:var(--ink)]"
-                        >
-                          <span className="currency-option">
-                            <span aria-hidden>{isoToFlag(item.flag)}</span>
-                            {item.code}
-                            <small>{item.label}</small>
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </FieldGroup>
-            </div>
-
-            <StepHeading
-              index={2}
-              title="What was bought"
-              description="Add, edit, or remove the line items."
-              meta={`${items.length} ${items.length === 1 ? "row" : "rows"}`}
-            />
-
-            <div className="items-editor">
-              {items.map((i) => (
-                <div className="item-row" key={i.id}>
-                  <div className="item-main">
-                    <Input
-                      aria-label="Item name"
-                      value={i.name}
-                      onChange={(e) => updateItem(i.id, "name", e.target.value)}
-                      className={controlClass}
-                    />
-                    <Input
-                      aria-label="Item detail"
-                      value={i.detail}
-                      onChange={(e) =>
-                        updateItem(i.id, "detail", e.target.value)
-                      }
-                      className={cn(controlClass, "sub-input")}
-                    />
-                  </div>
-                  <div className="qty">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        updateItem(i.id, "qty", Math.max(1, i.qty - 1))
-                      }
-                      aria-label="Decrease quantity"
-                    >
-                      <Minus size={13} />
-                    </Button>
-                    <span>{i.qty}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => updateItem(i.id, "qty", i.qty + 1)}
-                      aria-label="Increase quantity"
-                    >
-                      <Plus size={13} />
-                    </Button>
-                  </div>
-                  <label className="price-input">
-                    <span>{currency}</span>
-                    <Input
-                      aria-label={`Item price in ${currency}`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={i.price}
-                      onChange={(e) =>
-                        updateItem(i.id, "price", Number(e.target.value))
-                      }
-                      className={cn(controlClass, "text-right")}
-                    />
-                  </label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="delete-button"
-                    onClick={() => setItems(items.filter((x) => x.id !== i.id))}
-                    aria-label="Remove item"
-                  >
-                    <Trash2 size={15} />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="add-item"
-              onClick={() =>
-                setItems([
-                  ...items,
-                  {
-                    id: Date.now(),
-                    name: "New item",
-                    detail: "add a detail",
-                    qty: 1,
-                    price: 0,
-                  },
-                ])
-              }
-            >
-              <Plus size={16} /> Add another item
-            </Button>
-
-            <StepHeading
-              index={3}
-              title="Pick the mood"
-              description="Each mood carries its own palette and typeface."
-            />
-
-            <div className="theme-list">
-              {themes.map((o) => (
-                <button
-                  key={o.name}
-                  type="button"
-                  className={cn(
-                    "theme-option",
-                    theme.name === o.name && "active",
-                  )}
-                  onClick={() => setTheme(o)}
-                >
-                  <span
-                    className="theme-swatch"
-                    style={{
-                      background: o.paper,
-                      color: o.ink,
-                      fontFamily: o.font,
-                      fontWeight: o.weight,
-                    }}
-                  >
-                    <span
-                      className="theme-swatch-accent"
-                      style={{ background: o.accent }}
-                    />
-                    Aa
-                  </span>
-                  <span className="theme-copy">
-                    <b>{o.name}</b>
-                    <small>{o.vibe}</small>
-                  </span>
-                  {theme.name === o.name && <Check size={15} />}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="preview-panel">
-            <div className="preview-label">
-              <span>Live preview — {theme.name}</span>
-              <Button type="button" variant="ghost" size="sm" onClick={copy}>
-                {copied ? (
-                  <>
-                    <Check size={14} /> Copied
-                  </>
-                ) : (
-                  <>
-                    <Share2 size={14} /> Copy summary
-                  </>
-                )}
-              </Button>
-            </div>
-            <div className="receipt-wrap">
-              <Receipt
-                store={store}
-                title={title}
-                order={order}
-                date={date}
-                payment={payment}
-                items={items}
-                theme={theme}
-                logo={logo}
-                currency={currency}
-                thanks={thanks}
-                receiptRef={receiptRef}
-              />
-            </div>
-            <p className="preview-hint">
-              Updates as you type. Print it or save a PDF when it feels right.
-            </p>
-          </section>
-        </div>
-      </main>
-      <Footer />
-    </>
+function ReceiptGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" className="size-4" fill="none" aria-hidden>
+      <path
+        d="M3.5 1.5h9v13l-1.5-1-1.5 1-1.5-1-1.5 1-1.5-1-1.5 1z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <path d="M6 5.5h4M6 8h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
   );
 }

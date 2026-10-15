@@ -1,207 +1,216 @@
+export type ReceiptPattern = "none" | "dots" | "grid";
+
+/**
+ * Susunan nota. Warna semua tema sama-sama biru brand, jadi pembedanya
+ * ada di layout, tipografi, dan detail desain.
+ * - classic: logo & nomor di atas, judul, daftar item, total.
+ * - poster:  header blok biru penuh dengan nama toko besar.
+ * - ticket:  rata tengah ala struk kasir, titik-titik penghubung harga.
+ * - table:   tabel berkolom (item / qty / jumlah) dan blok info berbingkai.
+ * - wallet:  ala aplikasi pembayaran — segel & nominal besar di atas.
+ * - margin:  pita biru vertikal di kiri dengan nama toko diputar.
+ */
+export type ReceiptLayout = "classic" | "poster" | "ticket" | "table" | "wallet" | "margin";
+
 export type Theme = {
+  id: string;
   name: string;
   vibe: string;
+  layout: ReceiptLayout;
+  /** Teks utama nota. */
   ink: string;
+  /** Warna aksen: garis atas, logo default, blok header. */
   accent: string;
+  /** Warna teks di atas blok aksen. */
+  onAccent: string;
+  /** Warna kertas, juga background PNG hasil export. */
   paper: string;
-  surface: string;
-  font: string; // CSS variable set in lib/fonts.ts, e.g. "var(--font-cute)"
-  weight: number; // headline weight for this typeface
-  shape: string;
-  pattern: "none" | "dots" | "grid" | "lines" | "halftone" | "confetti";
+  /** CSS variable font dari lib/fonts.ts. */
+  font: string;
+  /** Ketebalan judul untuk typeface ini. */
+  weight: number;
+  radius: string;
+  pattern: ReceiptPattern;
+  /** Judul & label kapital dengan tracking rapat — karakter "poster". */
+  caps?: boolean;
+  /** Total & pembayaran dibingkai garis tegas. */
+  boxed?: boolean;
+  /** Garis pemisah solid tipis, bukan putus-putus. */
+  solidRules?: boolean;
 };
+
+/** Warna brand. Semua tema dibangun hanya dari palet ini. */
+export const BRAND = {
+  blue: "#1337ff",
+  white: "#ffffff",
+  ice: "#f2f4ff",
+  navy: "#0a0f33",
+  night: "#070b24",
+} as const;
+
+const { blue, white, ice, navy, night } = BRAND;
 
 export const themes: Theme[] = [
   {
-    name: "Cute",
-    vibe: "Soft & sunny",
-    ink: "#5b2a46",
-    accent: "#ff8fbe",
-    paper: "#fff7fb",
-    surface: "#5b2a46",
-    font: "var(--font-cute)",
-    weight: 700,
-    shape: "22px",
-    pattern: "dots",
-  },
-  {
-    name: "Cool",
-    vibe: "Electric current",
-    ink: "#0e2a52",
-    accent: "#5b8def",
-    paper: "#f3f7ff",
-    surface: "#0e2a52",
-    font: "var(--font-cool)",
+    id: "mono",
+    name: "Mono",
+    vibe: "Clean & precise",
+    layout: "classic",
+    ink: navy,
+    accent: blue,
+    onAccent: white,
+    paper: white,
+    font: "var(--font-geist)",
     weight: 600,
-    shape: "6px",
-    pattern: "grid",
+    radius: "12px",
+    pattern: "none",
+    solidRules: true,
   },
   {
-    name: "Classic",
-    vibe: "Timeless ledger",
-    ink: "#2b2620",
-    accent: "#b4894f",
-    paper: "#fbf6e9",
-    surface: "#3d372f",
-    font: "var(--font-classic)",
+    id: "poster",
+    name: "Poster",
+    vibe: "Big, loud header",
+    layout: "poster",
+    ink: navy,
+    accent: blue,
+    onAccent: white,
+    paper: white,
+    font: "var(--font-archivo)",
+    weight: 900,
+    radius: "0px",
+    pattern: "none",
+    caps: true,
+    solidRules: true,
+  },
+  {
+    id: "wallet",
+    name: "Wallet",
+    vibe: "Amount-first, app-like",
+    layout: "wallet",
+    ink: navy,
+    accent: blue,
+    onAccent: white,
+    paper: white,
+    font: "var(--font-rubik)",
     weight: 700,
-    shape: "0px",
+    radius: "24px",
+    pattern: "none",
+    solidRules: true,
+  },
+  {
+    id: "ticket",
+    name: "Ticket",
+    vibe: "Register tape, blue ink",
+    layout: "ticket",
+    ink: blue,
+    accent: blue,
+    onAccent: white,
+    paper: white,
+    font: "var(--font-geist-mono)",
+    weight: 600,
+    radius: "0px",
     pattern: "none",
   },
   {
-    name: "Modern",
-    vibe: "Clean contrast",
-    ink: "#121212",
-    accent: "#c6f24b",
-    paper: "#ffffff",
-    surface: "#121212",
-    font: "var(--font-modern)",
+    id: "cobalt",
+    name: "Cobalt",
+    vibe: "Tabular & boxed",
+    layout: "table",
+    ink: navy,
+    accent: blue,
+    onAccent: white,
+    paper: ice,
+    font: "var(--font-inter-tight)",
+    weight: 600,
+    radius: "0px",
+    pattern: "grid",
+    boxed: true,
+    solidRules: true,
+  },
+  {
+    id: "margin",
+    name: "Margin",
+    vibe: "Blue spine, editorial",
+    layout: "margin",
+    ink: navy,
+    accent: blue,
+    onAccent: white,
+    paper: white,
+    font: "var(--font-bricolage)",
     weight: 800,
-    shape: "10px",
+    radius: "6px",
     pattern: "none",
+    solidRules: true,
   },
   {
-    name: "Editorial",
-    vibe: "Ink & margin",
-    ink: "#2e2a57",
-    accent: "#b7a6ff",
-    paper: "#f7f5ff",
-    surface: "#2e2a57",
-    font: "var(--font-editorial)",
-    weight: 500,
-    shape: "0px",
-    pattern: "lines",
-  },
-  {
-    name: "Retro",
-    vibe: "Peachy nostalgia",
-    ink: "#6e3c2f",
-    accent: "#ffae5c",
-    paper: "#fff1dc",
-    surface: "#6e3c2f",
-    font: "var(--font-retro)",
-    weight: 800,
-    shape: "16px",
-    pattern: "dots",
-  },
-  {
-    name: "Minimal",
-    vibe: "Quiet essentials",
-    ink: "#454545",
-    accent: "#cfcfcf",
-    paper: "#fafafa",
-    surface: "#454545",
-    font: "var(--font-minimal)",
-    weight: 500,
-    shape: "3px",
+    id: "atelier",
+    name: "Atelier",
+    vibe: "Serif, quietly elegant",
+    layout: "classic",
+    ink: blue,
+    accent: blue,
+    onAccent: white,
+    paper: ice,
+    font: "var(--font-instrument-serif)",
+    weight: 400,
+    radius: "2px",
     pattern: "none",
+    solidRules: true,
   },
   {
-    name: "Botanical",
-    vibe: "Greenhouse hush",
-    ink: "#22392a",
-    accent: "#86b96a",
-    paper: "#f2f6ec",
-    surface: "#22392a",
-    font: "var(--font-botanical)",
-    weight: 600,
-    shape: "8px",
-    pattern: "lines",
-  },
-  {
-    name: "Noir",
-    vibe: "Midnight & gold",
-    ink: "#f2ece0",
-    accent: "#d8b25c",
-    paper: "#171512",
-    surface: "#000000",
-    font: "var(--font-noir)",
-    weight: 500,
-    shape: "2px",
+    id: "electric",
+    name: "Electric",
+    vibe: "Solid blue, all caps",
+    layout: "classic",
+    ink: white,
+    accent: white,
+    onAccent: blue,
+    paper: blue,
+    font: "var(--font-archivo)",
+    weight: 900,
+    radius: "0px",
     pattern: "none",
+    caps: true,
+    boxed: true,
   },
   {
-    name: "Pastel",
-    vibe: "Cotton-candy calm",
-    ink: "#4a3b5c",
-    accent: "#c9b6ff",
-    paper: "#faf7ff",
-    surface: "#4a3b5c",
-    font: "var(--font-pastel)",
+    id: "blueprint",
+    name: "Blueprint",
+    vibe: "Spec sheet on a grid",
+    layout: "table",
+    ink: white,
+    accent: white,
+    onAccent: blue,
+    paper: blue,
+    font: "var(--font-space-grotesk)",
     weight: 700,
-    shape: "18px",
+    radius: "4px",
+    pattern: "grid",
+    boxed: true,
+  },
+  {
+    id: "midnight",
+    name: "Midnight",
+    vibe: "Dark app card",
+    layout: "wallet",
+    ink: "#e8ecff",
+    accent: blue,
+    onAccent: white,
+    paper: night,
+    font: "var(--font-geist)",
+    weight: 600,
+    radius: "24px",
     pattern: "dots",
-  },
-  {
-    name: "Sunset",
-    vibe: "Coral horizon",
-    ink: "#5c2a1f",
-    accent: "#ff7a59",
-    paper: "#fff3ea",
-    surface: "#5c2a1f",
-    font: "var(--font-sunset)",
-    weight: 600,
-    shape: "14px",
-    pattern: "grid",
-  },
-  {
-    name: "Thermal",
-    vibe: "Register tape",
-    ink: "#1a1a1a",
-    accent: "#1a1a1a",
-    paper: "#ffffff",
-    surface: "#1a1a1a",
-    font: "var(--font-thermal)",
-    weight: 500,
-    shape: "0px",
-    pattern: "lines",
-  },
-  {
-    name: "Newsprint",
-    vibe: "Broadsheet ink",
-    ink: "#1d1d1d",
-    accent: "#c1121f",
-    paper: "#f1eee6",
-    surface: "#1d1d1d",
-    font: "var(--font-newsprint)",
-    weight: 600,
-    shape: "0px",
-    pattern: "halftone",
-  },
-  {
-    name: "Terrazzo",
-    vibe: "Confetti stone",
-    ink: "#38313f",
-    accent: "#e8615a",
-    paper: "#f6f1ec",
-    surface: "#38313f",
-    font: "var(--font-terrazzo)",
-    weight: 700,
-    shape: "20px",
-    pattern: "confetti",
-  },
-  {
-    name: "Citrus",
-    vibe: "Zesty morning",
-    ink: "#3b2b00",
-    accent: "#ffc93c",
-    paper: "#fffbf0",
-    surface: "#3b2b00",
-    font: "var(--font-citrus)",
-    weight: 600,
-    shape: "12px",
-    pattern: "none",
-  },
-  {
-    name: "Slate",
-    vibe: "Studio grey",
-    ink: "#1f2430",
-    accent: "#7c8ca6",
-    paper: "#f4f5f7",
-    surface: "#1f2430",
-    font: "var(--font-slate)",
-    weight: 500,
-    shape: "4px",
-    pattern: "grid",
+    solidRules: true,
   },
 ];
+
+export const DEFAULT_THEME = themes[0];
+
+export const findTheme = (id: string | undefined) =>
+  themes.find((theme) => theme.id === id) ?? DEFAULT_THEME;
+
+export const randomTheme = (exceptId?: string) => {
+  const pool = themes.filter((theme) => theme.id !== exceptId);
+  return pool[Math.floor(Math.random() * pool.length)];
+};
