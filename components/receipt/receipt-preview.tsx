@@ -371,7 +371,15 @@ function Wallet(ctx: Ctx) {
           <dd>{count}</dd>
         </div>
       </dl>
-      <Items {...ctx} />
+      <div className="receipt-wallet-items">
+        <Items {...ctx} />
+        {draft.items.length > 0 && (
+          <div className="receipt-wallet-total">
+            <span>Total</span>
+            <strong>{money(total, draft.currency)}</strong>
+          </div>
+        )}
+      </div>
       <Thanks {...ctx} />
       <Code {...ctx} />
     </>

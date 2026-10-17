@@ -651,7 +651,7 @@
   overflow-wrap: anywhere;
 }
 .receipt-wallet-details {
-  margin: 1.25rem 0 1.1rem;
+  margin: 1.25rem 0 0.6rem;
   padding: 0.3rem 0.9rem;
   border-radius: calc(var(--receipt-radius) * 0.6);
   background: color-mix(in srgb, var(--receipt-ink) 5%, transparent);
@@ -676,8 +676,45 @@
   text-align: right;
   overflow-wrap: anywhere;
 }
-.receipt[data-layout="wallet"] .receipt-items {
+/* Daftar item dibungkus kartu yang sama dengan detail di atasnya,
+   baris lebih rapat & dipisah garis tipis. */
+.receipt-wallet-items {
+  padding: 0.3rem 0.9rem;
+  border-radius: calc(var(--receipt-radius) * 0.6);
+  background: color-mix(in srgb, var(--receipt-ink) 5%, transparent);
   text-align: left;
+}
+.receipt-wallet-items .receipt-items {
+  gap: 0;
+}
+.receipt-wallet-items .receipt-item {
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+}
+.receipt-wallet-items .receipt-item + .receipt-item {
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 10%, transparent);
+}
+.receipt-wallet-items .receipt-item small {
+  font-size: 0.7rem;
+}
+.receipt-wallet-items .receipt-empty {
+  padding: 0.6rem 0;
+  font-size: 0.8rem;
+}
+.receipt-wallet-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0 0.45rem;
+  border-top: 1px dashed color-mix(in srgb, var(--receipt-ink) 22%, transparent);
+  font-size: 0.82rem;
+}
+.receipt-wallet-total span {
+  opacity: 0.6;
+}
+.receipt-wallet-total strong {
+  font-weight: var(--receipt-weight);
+  font-variant-numeric: tabular-nums;
 }
 
 /* -- Margin: pita biru vertikal dengan nama toko diputar -- */
