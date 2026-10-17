@@ -7,7 +7,7 @@ import { SITE } from "@/lib/site";
 import { COLOR_SCHEME_SCRIPT } from "@/components/color-scheme-toggle";
 
 export const metadata: Metadata = {
-  title: `${SITE.title} — receipts with a point of view`,
+  title: `${SITE.title} — on-brand receipts in seconds`,
   description: SITE.description,
   generator: SITE.title,
   icons: {

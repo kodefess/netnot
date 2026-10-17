@@ -109,7 +109,10 @@ function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
           <span className="grid size-8 place-items-center rounded-lg bg-brand text-brand-foreground">
             <ReceiptGlyph />
           </span>
-          <span className="font-display text-xl italic">{SITE.title}</span>
+          <span className="flex items-baseline gap-1.5" aria-label={SITE.title}>
+            <span className="text-[15px] font-bold tracking-[0.08em]">{SITE.brand}</span>
+            <span className="font-display text-xl text-brand-text italic">{SITE.product}</span>
+          </span>
         </a>
         <Button
           variant="ghost"

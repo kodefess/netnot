@@ -1,4 +1,6 @@
 export const SITE = {
-  title: "Receipt Studio",
-  description: "Create beautiful, customizable receipts for your store in seconds.",
+  brand: "JOYCO",
+  product: "Receipt",
+  title: "JOYCO Receipt",
+  description: "Create beautiful, on-brand receipts for your store in seconds.",
 };
