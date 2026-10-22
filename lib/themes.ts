@@ -9,8 +9,20 @@ export type ReceiptPattern = "none" | "dots" | "grid";
  * - table:   tabel berkolom (item / qty / jumlah) dan blok info berbingkai.
  * - wallet:  ala aplikasi pembayaran — segel & nominal besar di atas.
  * - margin:  pita biru vertikal di kiri dengan nama toko diputar.
+ * - swiss:   grid presisi bergaris hairline, item bernomor, total besar.
+ * - card:    kartu pembayaran biru (chip, nomor, pola gelombang) di atas, item di bawah.
+ * - folio:   kartu butik — bingkai ganda, monogram, serif miring, simetris.
  */
-export type ReceiptLayout = "classic" | "poster" | "ticket" | "table" | "wallet" | "margin";
+export type ReceiptLayout =
+  | "classic"
+  | "poster"
+  | "ticket"
+  | "table"
+  | "wallet"
+  | "margin"
+  | "swiss"
+  | "card"
+  | "folio";
 
 export type Theme = {
   id: string;
@@ -54,8 +66,8 @@ export const themes: Theme[] = [
   {
     id: "mono",
     name: "Mono",
-    vibe: "Clean & precise",
-    layout: "classic",
+    vibe: "Swiss grid, hairline precise",
+    layout: "swiss",
     ink: navy,
     accent: blue,
     onAccent: white,
@@ -114,18 +126,16 @@ export const themes: Theme[] = [
   {
     id: "cobalt",
     name: "Cobalt",
-    vibe: "Tabular & boxed",
-    layout: "table",
+    vibe: "Premium payment card",
+    layout: "card",
     ink: navy,
     accent: blue,
     onAccent: white,
-    paper: ice,
-    font: "var(--font-inter-tight)",
+    paper: white,
+    font: "var(--font-sora)",
     weight: 600,
-    radius: "0px",
-    pattern: "grid",
-    boxed: true,
-    solidRules: true,
+    radius: "16px",
+    pattern: "none",
   },
   {
     id: "margin",
@@ -145,12 +155,12 @@ export const themes: Theme[] = [
   {
     id: "atelier",
     name: "Atelier",
-    vibe: "Serif, quietly elegant",
-    layout: "classic",
+    vibe: "Framed boutique folio",
+    layout: "folio",
     ink: blue,
     accent: blue,
     onAccent: white,
-    paper: ice,
+    paper: white,
     font: "var(--font-instrument-serif)",
     weight: 400,
     radius: "2px",

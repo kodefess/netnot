@@ -6,7 +6,9 @@ const PUBLIC_PATHS = ["/gate", "/api/auth"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+  if (
+    PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+  ) {
     return NextResponse.next();
   }
 

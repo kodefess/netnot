@@ -744,6 +744,489 @@
   text-overflow: ellipsis;
 }
 
+/* -- Swiss (Mono): grid presisi, label mono kecil, hairline -- */
+.swiss-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.swiss-label.is-strong {
+  opacity: 1;
+  color: var(--receipt-accent);
+}
+.swiss-top {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.swiss-top .receipt-mark {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.swiss-top .swiss-label:first-of-type {
+  margin-right: auto;
+}
+.swiss-store {
+  margin: 1.6rem 0 1.25rem;
+  font-size: 2.15rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+.swiss-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  border-top: 1px solid var(--receipt-ink);
+}
+.swiss-grid > div {
+  min-width: 0;
+  padding: 0.6rem 0 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--receipt-ink) 14%, transparent);
+}
+.swiss-grid > div:nth-child(odd) {
+  padding-right: 0.75rem;
+  border-right: 1px solid color-mix(in srgb, var(--receipt-ink) 14%, transparent);
+}
+.swiss-grid > div:nth-child(even) {
+  padding-left: 0.75rem;
+}
+.swiss-grid dd {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.swiss-items {
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.swiss-items li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.6rem 0;
+  font-size: 0.86rem;
+}
+.swiss-items li + li {
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 8%, transparent);
+}
+.swiss-index {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: var(--receipt-accent);
+}
+.swiss-items strong {
+  display: block;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.swiss-items small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  opacity: 0.55;
+}
+.swiss-items li > span:last-child {
+  font-variant-numeric: tabular-nums;
+}
+.swiss-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--receipt-ink);
+}
+.swiss-total > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.swiss-total strong {
+  font-size: 2rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.swiss-total .receipt-stamp {
+  width: 4.6rem;
+  height: 4.6rem;
+  transform: rotate(-10deg);
+}
+.receipt[data-layout="swiss"] .receipt-thanks {
+  margin-top: 1.25rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.receipt[data-layout="swiss"] .receipt-seal-code {
+  text-align: left;
+}
+
+/* -- Card (Cobalt): kartu pembayaran biru premium + ringkasan -- */
+.receipt[data-layout="card"] {
+  padding: 1.1rem 1.1rem calc(1.4rem + var(--zig));
+}
+.cc {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1.586;
+  padding: 1rem 1.1rem;
+  border-radius: var(--receipt-radius);
+  /* Satu hue biru brand: terang di pojok kiri atas, lebih dalam di kanan bawah. */
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 0.22), transparent 55%),
+    linear-gradient(135deg, var(--receipt-accent) 0%, color-mix(in srgb, var(--receipt-accent) 72%, #000) 100%);
+  color: var(--receipt-on-accent);
+  box-shadow:
+    0 14px 28px -14px color-mix(in srgb, var(--receipt-accent) 70%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+.cc-waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgb(255 255 255 / 0.13);
+  stroke-width: 0.8;
+}
+.cc > :not(.cc-waves) {
+  position: relative;
+}
+.cc-top {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.cc-top .receipt-mark {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  background: var(--receipt-on-accent);
+  color: var(--receipt-accent);
+}
+.cc-store {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: var(--receipt-weight);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cc-paid {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: 999px;
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgb(255 255 255 / 0.12);
+}
+.cc-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: auto;
+}
+.cc-chip {
+  width: 2.3rem;
+  height: auto;
+  fill: rgb(255 255 255 / 0.85);
+  stroke: color-mix(in srgb, var(--receipt-accent) 55%, #fff);
+  stroke-width: 1;
+}
+.cc-nfc {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: rgb(255 255 255 / 0.8);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.cc-number {
+  margin: 0.7rem 0 0;
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cc-number span {
+  opacity: 0.7;
+  letter-spacing: 0.12em;
+}
+.cc-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+.cc-bottom > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.cc-bottom > div:last-child {
+  text-align: right;
+}
+.cc-bottom span {
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.cc-bottom strong {
+  overflow: hidden;
+  font-size: 0.74rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.card-amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.25rem 0.35rem 0;
+}
+.card-amount > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.card-amount .receipt-kicker {
+  margin: 0 0 0.25rem;
+}
+.card-amount strong {
+  font-size: 2rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.card-amount small {
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  opacity: 0.55;
+}
+.card-amount .receipt-stamp {
+  width: 4.7rem;
+  height: 4.7rem;
+  transform: rotate(-10deg);
+}
+.card-items {
+  margin: 1.1rem 0.35rem 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 10%, transparent);
+}
+.card-items li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--receipt-ink) 10%, transparent);
+  font-size: 0.84rem;
+}
+.card-qty {
+  display: grid;
+  place-items: center;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  padding: 0 0.3rem;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--receipt-accent) 9%, var(--receipt-paper));
+  color: var(--receipt-accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.card-items strong {
+  display: block;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.card-items small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.7rem;
+  opacity: 0.55;
+}
+.card-items li > span:last-child {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.receipt[data-layout="card"] .receipt-thanks {
+  margin-top: 1.2rem;
+  font-size: 0.88rem;
+}
+
+/* -- Folio (Atelier): kartu butik simetris dengan bingkai ganda -- */
+.receipt[data-layout="folio"] {
+  padding: 2.4rem calc(var(--pad-x) + 0.6rem) calc(2rem + var(--zig));
+  text-align: center;
+}
+.folio-frame {
+  position: absolute;
+  inset: 0.65rem 0.65rem calc(var(--zig) + 0.65rem);
+  border: 1px solid color-mix(in srgb, var(--receipt-ink) 60%, transparent);
+  pointer-events: none;
+}
+.folio-frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 0.5px solid color-mix(in srgb, var(--receipt-ink) 35%, transparent);
+}
+.folio-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-geist), ui-sans-serif, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.folio-monogram {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+.folio-monogram .receipt-mark {
+  width: 3.4rem;
+  height: 3.4rem;
+  border: 1px solid var(--receipt-accent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--receipt-accent);
+  font-size: 1.9rem;
+  font-style: italic;
+  /* Cincin tipis kedua di luar monogram. */
+  box-shadow: 0 0 0 3px var(--receipt-paper), 0 0 0 3.5px color-mix(in srgb, var(--receipt-accent) 40%, transparent);
+}
+.folio-label {
+  margin: 1rem 0 0;
+  font-family: var(--font-geist), ui-sans-serif, sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.folio-store {
+  margin: 0.35rem 0 0;
+  font-size: 2.3rem;
+  font-weight: var(--receipt-weight);
+  font-style: italic;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.folio-ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.1rem auto 1.2rem;
+  max-width: 9rem;
+  font-size: 0.7rem;
+}
+.folio-ornament span {
+  flex: 1;
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 40%, transparent);
+}
+.folio-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+}
+.folio-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.folio-item > div {
+  min-width: 0;
+}
+.folio-item strong {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.folio-item small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.82rem;
+  font-style: italic;
+  opacity: 0.65;
+}
+.folio-item > span {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+.folio-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  padding: 0.8rem 0 0.7rem;
+  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 50%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--receipt-ink) 50%, transparent);
+  text-align: left;
+}
+.folio-total span {
+  font-size: 1.3rem;
+  font-style: italic;
+}
+.folio-total strong {
+  font-size: 1.75rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.receipt[data-layout="folio"] .receipt-stamp.is-center {
+  margin-top: 1.1rem;
+  transform: rotate(-6deg);
+}
+.receipt[data-layout="folio"] .receipt-thanks {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.3;
+}
+
 /* ---- Pola latar kertas, sesuai theme.pattern ---- */
 .pattern-dots {
   background-image: radial-gradient(color-mix(in srgb, var(--receipt-ink) 12%, transparent) 1.2px, transparent 1.2px);
