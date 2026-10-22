@@ -4,8 +4,8 @@ import {
   Geist,
   Geist_Mono,
   Instrument_Serif,
-  Inter_Tight,
   Rubik,
+  Sora,
   Space_Grotesk,
 } from "next/font/google";
 
@@ -15,7 +15,7 @@ import {
 // bukan sesuai tema, supaya satu font bisa dipakai ulang oleh tema lain.
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
-const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight" });
+const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const rubik = Rubik({ subsets: ["latin"], variable: "--font-rubik" });
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -44,7 +44,7 @@ export const fontVariables = [
   geistMono,
   instrumentSerif,
   archivo,
-  interTight,
+  sora,
   rubik,
   bricolage,
   spaceGrotesk,

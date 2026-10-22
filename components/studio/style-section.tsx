@@ -111,6 +111,56 @@ function LayoutSketch({ theme }: { theme: Theme }) {
   );
 
   switch (layout) {
+    case "swiss":
+      return (
+        <span className="block px-3 pt-2.5">
+          <span className="flex items-center gap-1">
+            <span className="block size-2.5 rounded-[3px]" style={{ background: accent }} />
+            <span className="ml-auto">{line("22%", 0.6, accent)}</span>
+          </span>
+          <span className="mt-1.5 block tracking-tighter" style={type("20px")}>Aa</span>
+          <span className="mt-1.5 grid grid-cols-2 border-t" style={{ borderColor: ink }}>
+            <span className="block h-2.5 border-r border-b" style={{ borderColor: `${ink}22` }} />
+            <span className="block h-2.5 border-b" style={{ borderColor: `${ink}22` }} />
+          </span>
+          <span className="mt-1.5 flex items-center gap-1.5">
+            <span className="font-mono text-[7px]" style={{ color: accent }}>01</span>
+            {line("45%")}
+          </span>
+        </span>
+      );
+    case "card":
+      return (
+        <span className="block px-2.5 pt-2.5">
+          <span
+            className="relative flex aspect-[1.586] w-full flex-col justify-between overflow-hidden rounded-md p-1.5"
+            style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 72%, #000))` }}
+          >
+            <span className="flex items-center gap-1">
+              <span className="block size-1.5 rounded-[2px]" style={{ background: onAccent }} />
+              <span style={type("8px", onAccent)}>Aa</span>
+            </span>
+            <span className="block h-1.5 w-2.5 rounded-[2px]" style={{ background: onAccent, opacity: 0.85 }} />
+            <span className="block h-0.5 w-3/4 rounded-full" style={{ background: onAccent, opacity: 0.6 }} />
+          </span>
+        </span>
+      );
+    case "folio":
+      return (
+        <span className="absolute inset-1.5 flex flex-col items-center border pt-1.5" style={{ borderColor: `${ink}99` }}>
+          <span
+            className="grid size-5 place-items-center rounded-full border italic"
+            style={{ ...type("11px"), borderColor: accent }}
+          >
+            A
+          </span>
+          <span className="mt-1 italic" style={type("16px")}>Aa</span>
+          <span className="mt-1 flex items-center gap-1 text-[6px]" style={{ color: ink }}>
+            <span className="block w-4 border-t" style={{ borderColor: `${ink}66` }} />✦
+            <span className="block w-4 border-t" style={{ borderColor: `${ink}66` }} />
+          </span>
+        </span>
+      );
     case "poster":
       return (
         <>

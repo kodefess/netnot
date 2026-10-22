@@ -134,7 +134,10 @@ function Total({ draft, total, count }: Ctx) {
   return (
     <div className="receipt-total">
       <span>
-        Total <small>· {count} {count === 1 ? "item" : "items"}</small>
+        Total{" "}
+        <small>
+          · {count} {count === 1 ? "item" : "items"}
+        </small>
       </span>
       <strong>{money(total, draft.currency)}</strong>
     </div>
@@ -185,7 +188,12 @@ function Barcode({ seed }: Ctx) {
     x += w + gap;
   }
   return (
-    <svg className="receipt-barcode" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden>
+    <svg
+      className="receipt-barcode"
+      viewBox="0 0 100 14"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
       {bars.map((b) => (
         <rect key={b.x} x={b.x} width={b.w} height="14" fill="currentColor" />
       ))}
@@ -325,7 +333,9 @@ function Table(ctx: Ctx) {
               {item.detail && <small>{item.detail}</small>}
             </span>
             <span role="cell">{item.qty}</span>
-            <span role="cell">{money(item.qty * item.price, draft.currency)}</span>
+            <span role="cell">
+              {money(item.qty * item.price, draft.currency)}
+            </span>
           </div>
         ))}
         <div className="receipt-table-row is-foot" role="row">
@@ -345,7 +355,9 @@ function Wallet(ctx: Ctx) {
   return (
     <>
       <Seal {...ctx} className="is-hero" />
-      <p className="receipt-kicker receipt-wallet-kicker">{draft.title || "Payment receipt"}</p>
+      <p className="receipt-kicker receipt-wallet-kicker">
+        {draft.title || "Payment receipt"}
+      </p>
       <p className="receipt-wallet-amount">{money(total, draft.currency)}</p>
       <div className="receipt-wallet-to">
         <Mark {...ctx} />
@@ -410,7 +422,211 @@ function MarginLayout(ctx: Ctx) {
   );
 }
 
+/** Mono — grid Swiss: label mono kecil, hairline, item bernomor. */
+function Swiss(ctx: Ctx) {
+  const { draft, total, count } = ctx;
+  const cells: [string, React.ReactNode][] = [
+    ["Date", draft.date || "—"],
+    ["Paid via", draft.payment || "—"],
+    ["Items", count],
+    ["Currency", draft.currency],
+  ];
+  return (
+    <>
+      <header className="swiss-top">
+        <Mark {...ctx} />
+        <span className="swiss-label">{draft.title || "Payment receipt"}</span>
+        <span className="swiss-label is-strong">#{draft.order || "0000"}</span>
+      </header>
+      <h2 className="swiss-store">{draft.store || "Your store"}</h2>
+      <dl className="swiss-grid">
+        {cells.map(([label, value]) => (
+          <div key={label}>
+            <dt className="swiss-label">{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {draft.items.length ? (
+        <ol className="swiss-items">
+          {draft.items.map((item, i) => (
+            <li key={item.id}>
+              <span className="swiss-index">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <strong>{item.name || "Untitled item"}</strong>
+                <small>
+                  {item.qty} × {money(item.price, draft.currency)}
+                  {item.detail && ` · ${item.detail}`}
+                </small>
+              </div>
+              <span>{money(item.qty * item.price, draft.currency)}</span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="receipt-empty">No items yet</p>
+      )}
+      <div className="swiss-total">
+        <div>
+          <span className="swiss-label">Amount paid</span>
+          <strong>{money(total, draft.currency)}</strong>
+        </div>
+        <Seal {...ctx} className="is-inline" />
+      </div>
+      <Thanks {...ctx} />
+      <Code {...ctx} />
+    </>
+  );
+}
+
+/** Garis gelombang halus di kartu — fase & frekuensinya dari data nota. */
+function cardWaves(seed: string) {
+  let h = sealHash(`card|${seed}`);
+  const next = () => {
+    h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d) >>> 0;
+    return h / 4294967296;
+  };
+  const freq = 0.018 + next() * 0.014;
+  const phase = next() * Math.PI * 2;
+  const amp = 10 + next() * 8;
+  return Array.from({ length: 16 }, (_, i) => {
+    let d = "";
+    for (let x = 0; x <= 320; x += 8) {
+      const y = 40 + i * 9 + amp * Math.sin(x * freq + phase + i * 0.22);
+      d += `${x ? "L" : "M"}${x},${y.toFixed(1)}`;
+    }
+    return d;
+  });
+}
+
+/** Cobalt — kartu pembayaran biru premium di atas, ringkasan di bawah. */
+function Card(ctx: Ctx) {
+  const { draft, total, count, seed } = ctx;
+  return (
+    <>
+      <div className="cc">
+        <svg className="cc-waves" viewBox="0 0 320 200" preserveAspectRatio="none" aria-hidden>
+          {cardWaves(seed).map((d, i) => (
+            <path key={i} d={d} />
+          ))}
+        </svg>
+        <div className="cc-top">
+          <Mark {...ctx} />
+          <span className="cc-store">{draft.store || "Your store"}</span>
+          <span className="cc-paid">Paid</span>
+        </div>
+        <div className="cc-chip-row" aria-hidden>
+          <svg className="cc-chip" viewBox="0 0 40 30">
+            <rect x="0.5" y="0.5" width="39" height="29" rx="6" />
+            <path d="M0 10h12M0 20h12M28 10h12M28 20h12M12 0v30M28 0v30M12 15h16" />
+          </svg>
+          <svg className="cc-nfc" viewBox="0 0 24 24">
+            <path d="M8 7a7 7 0 0 1 0 10M12 4a11 11 0 0 1 0 16M4 10a3 3 0 0 1 0 4" />
+          </svg>
+        </div>
+        <p className="cc-number">
+          <span>••••</span> <span>••••</span> <span>••••</span> {draft.order || "0000"}
+        </p>
+        <div className="cc-bottom">
+          <div>
+            <span>Date</span>
+            <strong>{draft.date || "—"}</strong>
+          </div>
+          <div>
+            <span>Paid via</span>
+            <strong>{draft.payment || "—"}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="card-amount">
+        <div>
+          <p className="receipt-kicker">{draft.title || "Payment receipt"}</p>
+          <strong>{money(total, draft.currency)}</strong>
+          <small>
+            {count} {count === 1 ? "item" : "items"} · {draft.currency}
+          </small>
+        </div>
+        <Seal {...ctx} className="is-inline" />
+      </div>
+
+      {draft.items.length ? (
+        <ul className="card-items">
+          {draft.items.map((item) => (
+            <li key={item.id}>
+              <span className="card-qty">{item.qty}×</span>
+              <div>
+                <strong>{item.name || "Untitled item"}</strong>
+                <small>
+                  {money(item.price, draft.currency)}
+                  {item.detail && ` · ${item.detail}`}
+                </small>
+              </div>
+              <span>{money(item.qty * item.price, draft.currency)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="receipt-empty">No items yet</p>
+      )}
+      <Thanks {...ctx} />
+      <Code {...ctx} />
+    </>
+  );
+}
+
+/** Atelier — folio butik: bingkai ganda, monogram, serif miring, simetris. */
+function Folio(ctx: Ctx) {
+  const { draft, total } = ctx;
+  return (
+    <>
+      <div className="folio-frame" aria-hidden />
+      <header className="folio-top">
+        <span>N° {draft.order || "0000"}</span>
+        <span>{draft.date || "—"}</span>
+      </header>
+      <div className="folio-monogram">
+        <Mark {...ctx} />
+      </div>
+      <p className="folio-label">{draft.title || "Payment receipt"}</p>
+      <h2 className="folio-store">{draft.store || "Your store"}</h2>
+      <div className="folio-ornament" aria-hidden>
+        <span />✦<span />
+      </div>
+      {draft.items.length ? (
+        <div className="folio-items">
+          {draft.items.map((item) => (
+            <div className="folio-item" key={item.id}>
+              <div>
+                <strong>{item.name || "Untitled item"}</strong>
+                <small>
+                  {item.qty} × {money(item.price, draft.currency)}
+                  {item.detail && ` — ${item.detail}`}
+                </small>
+              </div>
+              <span>{money(item.qty * item.price, draft.currency)}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="receipt-empty">No items yet</p>
+      )}
+      <div className="folio-total">
+        <span>Total</span>
+        <strong>{money(total, draft.currency)}</strong>
+      </div>
+      <p className="folio-label">Paid via {draft.payment || "—"}</p>
+      <Seal {...ctx} className="is-center" />
+      <Thanks {...ctx} />
+      <Code {...ctx} />
+    </>
+  );
+}
+
 const layouts: Record<Theme["layout"], (ctx: Ctx) => React.ReactNode> = {
+  swiss: Swiss,
+  card: Card,
+  folio: Folio,
   classic: Classic,
   poster: Poster,
   ticket: Ticket,
