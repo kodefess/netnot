@@ -11,6 +11,7 @@ export type ReceiptPattern = "none" | "dots" | "grid";
  * - margin:  pita biru vertikal di kiri dengan nama toko diputar.
  * - swiss:   grid presisi bergaris hairline, item bernomor, total besar.
  * - card:    kartu pembayaran biru (chip, nomor, pola gelombang) di atas, item di bawah.
+ * - hub:     gaya JOYCO Hub — strip segmen kotak, label mono, badge, kartu wireframe.
  * - folio:   kartu butik — bingkai ganda, monogram, serif miring, simetris.
  */
 export type ReceiptLayout =
@@ -22,7 +23,8 @@ export type ReceiptLayout =
   | "margin"
   | "swiss"
   | "card"
-  | "folio";
+  | "folio"
+  | "hub";
 
 export type Theme = {
   id: string;
@@ -63,6 +65,37 @@ export const BRAND = {
 const { blue, white, ice, navy, night } = BRAND;
 
 export const themes: Theme[] = [
+  // Mengikuti bahasa visual JOYCO Hub: abu gelap, kotak tegas, biru brand.
+  {
+    id: "joyco-studio",
+    name: "JOYCO Studio",
+    vibe: "Hub grid, crisp & square",
+    layout: "hub",
+    ink: "#ebebeb",
+    accent: blue,
+    onAccent: white,
+    paper: "#0b0b0b",
+    font: "var(--font-public-sans)",
+    weight: 600,
+    radius: "0px",
+    pattern: "none",
+  },
+  // Versi terang dari JOYCO Studio — layout sama, abu-abunya diturunkan
+  // otomatis dari ink & paper (lihat .receipt[data-layout="hub"]).
+  {
+    id: "joyco-studio-light",
+    name: "JOYCO Studio Light",
+    vibe: "Hub grid, light & crisp",
+    layout: "hub",
+    ink: "#0b0b0b",
+    accent: blue,
+    onAccent: white,
+    paper: "#fafafa",
+    font: "var(--font-public-sans)",
+    weight: 600,
+    radius: "0px",
+    pattern: "none",
+  },
   {
     id: "mono",
     name: "Mono",

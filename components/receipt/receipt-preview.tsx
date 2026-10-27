@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, Package, ReceiptText, WalletCards } from "lucide-react";
 
 import { PaidSeal, sealCode, sealHash } from "@/components/receipt/paid-seal";
 import type { ReceiptDraft } from "@/hooks/use-receipt";
@@ -575,6 +575,143 @@ function Card(ctx: Ctx) {
   );
 }
 
+/** JOYCO Studio — bahasa visual JOYCO Hub: sidebar rail, strip segmen kotak,
+ *  label mono, badge, dan kartu ber-grid biru dengan bracket sudut. */
+function Hub(ctx: Ctx) {
+  const { draft, total, count, code } = ctx;
+  const [first, second] = draft.thanks;
+  return (
+    <div className="hub-shell">
+      <aside className="hub-rail" aria-hidden>
+        <span className="hub-logo">
+          <Mark {...ctx} />
+        </span>
+        <span className="hub-tab">
+          <span>Receipt</span>
+          <ReceiptText size={13} />
+        </span>
+        <span className="hub-box">
+          <CalendarDays size={13} />
+        </span>
+        <span className="hub-box">
+          <WalletCards size={13} />
+        </span>
+        <span className="hub-box">
+          <Package size={13} />
+        </span>
+        <span className="hub-rail-fill" />
+        <span className="hub-box hub-diamond">
+          <svg viewBox="0 0 16 16">
+            <rect x="4" y="4" width="4" height="4" />
+            <rect x="8" y="8" width="4" height="4" className="is-blue" />
+            <rect x="8" y="4" width="4" height="4" className="is-dim" />
+            <rect x="4" y="8" width="4" height="4" className="is-dim" />
+          </svg>
+        </span>
+      </aside>
+
+      <div className="hub-main">
+        <div className="hub-crumb">
+          <span className="hub-crumb-icon" aria-hidden>
+            <svg viewBox="0 0 16 16">
+              <path d="M8 1.5 14 5v6l-6 3.5L2 11V5z" />
+            </svg>
+          </span>
+          <span className="hub-crumb-text">
+            <b>Receipt</b>
+            <span>
+              #{draft.order || "0000"} / Details
+            </span>
+          </span>
+          <ChevronDown size={12} aria-hidden />
+        </div>
+
+        <div className="hub-chips">
+          <span className="hub-chip">{draft.title || "Payment receipt"}</span>
+          <span className="hub-chip is-blue">Paid</span>
+        </div>
+        <h2 className="hub-title">{draft.store || "Your store"}</h2>
+
+        <div className="hub-toolbar">
+          <span className="hub-btn">
+            <CalendarDays size={12} aria-hidden />
+            {draft.date || "—"}
+          </span>
+          <span className="hub-btn">
+            <WalletCards size={12} aria-hidden />
+            {draft.payment || "—"}
+          </span>
+        </div>
+
+        <div className="hub-section">
+          <h3>Items</h3>
+          <span className="hub-count">{count}</span>
+        </div>
+        {draft.items.length ? (
+          <div className="hub-list">
+            {draft.items.map((item, i) => (
+              <div className="hub-strip" key={item.id}>
+                <span className="hub-box">{String(i + 1).padStart(2, "0")}</span>
+                <span className="hub-seg hub-grow is-item">
+                  <span className="hub-item">
+                    <span className="hub-name">{item.name || "Untitled item"}</span>
+                    <small>
+                      {item.qty} × {money(item.price, draft.currency)}
+                      {item.detail && ` · ${item.detail}`}
+                    </small>
+                  </span>
+                  <span className="hub-badge">{money(item.qty * item.price, draft.currency)}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="receipt-empty">No items yet</p>
+        )}
+
+        <div className="hub-card">
+          <div className="hub-strip">
+            <span className="hub-box" aria-hidden>
+              Σ
+            </span>
+            <span className="hub-seg hub-grow">
+              Total paid
+              <span className="hub-badge">{draft.currency}</span>
+            </span>
+          </div>
+          <div className="hub-card-body">
+            <i className="hub-corner is-tl" />
+            <i className="hub-corner is-tr" />
+            <i className="hub-corner is-bl" />
+            <i className="hub-corner is-br" />
+            <div>
+              <small>
+                {count} {count === 1 ? "item" : "items"}
+              </small>
+              <strong>{money(total, draft.currency)}</strong>
+            </div>
+            <Seal {...ctx} className="is-inline" />
+          </div>
+        </div>
+
+        <div className="hub-foot">
+          {(first || second) && (
+            <p className="hub-note">
+              {first}
+              {first && second && " "}
+              {second}
+            </p>
+          )}
+          <div className="hub-strip hub-meta">
+            <span className="hub-seg hub-grow">Seal</span>
+            <span className="hub-seg">{code}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Atelier — folio butik: bingkai ganda, monogram, serif miring, simetris. */
 function Folio(ctx: Ctx) {
   const { draft, total } = ctx;
@@ -627,6 +764,7 @@ const layouts: Record<Theme["layout"], (ctx: Ctx) => React.ReactNode> = {
   swiss: Swiss,
   card: Card,
   folio: Folio,
+  hub: Hub,
   classic: Classic,
   poster: Poster,
   ticket: Ticket,
