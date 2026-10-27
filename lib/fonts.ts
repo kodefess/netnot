@@ -4,6 +4,8 @@ import {
   Geist,
   Geist_Mono,
   Instrument_Serif,
+  Public_Sans,
+  Roboto_Mono,
   Rubik,
   Sora,
   Space_Grotesk,
@@ -15,6 +17,9 @@ import {
 // bukan sesuai tema, supaya satu font bisa dipakai ulang oleh tema lain.
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
+// Pasangan typeface JOYCO Hub: Public Sans (judul/isi) + Roboto Mono (label).
+const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-public-sans" });
+const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-roboto-mono" });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const rubik = Rubik({ subsets: ["latin"], variable: "--font-rubik" });
 const bricolage = Bricolage_Grotesque({
@@ -45,6 +50,8 @@ export const fontVariables = [
   instrumentSerif,
   archivo,
   sora,
+  publicSans,
+  robotoMono,
   rubik,
   bricolage,
   spaceGrotesk,

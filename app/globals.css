@@ -1088,6 +1088,374 @@
   font-size: 0.88rem;
 }
 
+/* -- Hub (JOYCO Studio & Light): meniru JOYCO Hub — sidebar rail di kiri,
+   strip segmen kotak bercelah 2px, label Roboto Mono kapital, badge, dan
+   kartu ber-grid biru dengan bracket sudut. Semua abu-abu diturunkan dari
+   ink & paper, jadi varian gelap/terang cukup beda di objek tema. -- */
+.receipt[data-layout="hub"] {
+  --hub-panel: color-mix(in srgb, var(--receipt-ink) 6%, var(--receipt-paper));
+  --hub-seg: color-mix(in srgb, var(--receipt-ink) 11%, var(--receipt-paper));
+  --hub-seg-hi: color-mix(in srgb, var(--receipt-ink) 19%, var(--receipt-paper));
+  --hub-muted: color-mix(in srgb, var(--receipt-ink) 60%, var(--receipt-paper));
+  --hub-line: color-mix(in srgb, var(--receipt-ink) 22%, transparent);
+  --hub-mono: var(--font-roboto-mono), ui-monospace, monospace;
+  --hub-rail: 2.5rem;
+  padding: 0 0 var(--zig);
+}
+.hub-shell {
+  display: grid;
+  grid-template-columns: var(--hub-rail) minmax(0, 1fr);
+}
+
+/* Sidebar rail */
+.hub-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 2px;
+}
+.hub-logo,
+.hub-box,
+.hub-tab,
+.hub-rail-fill,
+.hub-seg {
+  background: var(--hub-seg);
+}
+.hub-logo {
+  display: grid;
+  height: var(--hub-rail);
+  background: var(--receipt-accent);
+}
+.hub-logo .receipt-mark {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  font-size: 1.1rem;
+}
+.hub-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.75rem 0 0.65rem;
+  background: var(--hub-seg-hi);
+  color: var(--receipt-ink);
+}
+.hub-tab span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--hub-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.hub-box {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--hub-rail);
+  height: var(--hub-rail);
+  font-family: var(--hub-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  color: var(--hub-muted);
+}
+.hub-rail .hub-box {
+  width: 100%;
+}
+.hub-rail-fill {
+  flex: 1;
+  min-height: 1rem;
+}
+.hub-diamond svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  transform: rotate(45deg);
+  fill: var(--receipt-ink);
+}
+.hub-diamond .is-blue {
+  fill: var(--receipt-accent);
+}
+.hub-diamond .is-dim {
+  fill: var(--receipt-paper);
+}
+
+/* Konten utama */
+.hub-main {
+  min-width: 0;
+  padding: 0.9rem 0.95rem 1.2rem 1rem;
+}
+.hub-crumb {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--hub-line);
+  color: var(--hub-muted);
+}
+.hub-crumb-icon svg {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+}
+.hub-crumb-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--hub-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+.hub-crumb-text b {
+  font-weight: 500;
+  color: var(--receipt-ink);
+}
+.hub-crumb-text span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hub-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 1.1rem;
+}
+.hub-chip {
+  padding: 0.22rem 0.45rem;
+  background: var(--hub-seg);
+  font-family: var(--hub-mono);
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+}
+.hub-chip.is-blue {
+  background: var(--receipt-accent);
+  color: var(--receipt-on-accent);
+}
+.hub-title {
+  margin: 0.65rem 0 0;
+  font-size: 1.75rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+
+/* Tombol meta, seperti tombol toolbar di JOYCO Hub */
+.hub-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px;
+  margin-top: 0.85rem;
+}
+.hub-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.4rem 0.55rem;
+  background: var(--hub-seg);
+  font-family: var(--hub-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--receipt-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hub-btn svg {
+  flex-shrink: 0;
+  color: var(--hub-muted);
+}
+
+/* Strip segmen (item, header kartu, footer) */
+.hub-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+.hub-seg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--hub-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+}
+.hub-grow {
+  flex: 1;
+}
+.hub-strip > .hub-box {
+  width: 2.3rem;
+  height: auto;
+  min-height: 2.3rem;
+}
+.hub-badge {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0.2rem 0.4rem;
+  background: var(--hub-panel);
+  font-family: var(--hub-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--receipt-ink);
+}
+
+.hub-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.4rem 0 0.55rem;
+}
+.hub-section h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--receipt-weight);
+  letter-spacing: -0.02em;
+}
+.hub-count {
+  padding: 0.08rem 0.38rem;
+  background: var(--hub-seg);
+  font-family: var(--hub-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+.hub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hub-seg.is-item {
+  padding-block: 0.5rem;
+}
+.hub-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.hub-name {
+  font-size: 0.64rem;
+  font-weight: 500;
+  color: var(--receipt-ink);
+  overflow-wrap: anywhere;
+}
+.hub-item small {
+  font-size: 0.56rem;
+  letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+/* Kartu total: header strip + area grid biru ber-bracket sudut */
+.hub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 1rem;
+}
+.hub-card-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1rem;
+  background-color: var(--hub-panel);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--receipt-accent) 20%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--receipt-accent) 20%, transparent) 1px, transparent 1px);
+  background-size: 14px 14px;
+  background-position: -1px -1px;
+}
+.hub-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 0 solid var(--receipt-accent);
+}
+.hub-corner.is-tl {
+  top: 5px;
+  left: 5px;
+  border-width: 1.5px 0 0 1.5px;
+}
+.hub-corner.is-tr {
+  top: 5px;
+  right: 5px;
+  border-width: 1.5px 1.5px 0 0;
+}
+.hub-corner.is-bl {
+  bottom: 5px;
+  left: 5px;
+  border-width: 0 0 1.5px 1.5px;
+}
+.hub-corner.is-br {
+  right: 5px;
+  bottom: 5px;
+  border-width: 0 1.5px 1.5px 0;
+}
+.hub-card-body > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.hub-card-body small {
+  font-family: var(--hub-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+}
+.hub-card-body strong {
+  font-size: 1.75rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.hub-card-body .receipt-stamp {
+  width: 4.4rem;
+  height: 4.4rem;
+  transform: rotate(-8deg);
+}
+
+/* Footer: catatan + strip kode segel */
+.hub-foot {
+  margin-top: 1rem;
+}
+.hub-note {
+  margin: 0 0 0.7rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--hub-muted);
+}
+.hub-meta .hub-seg:last-child {
+  font-weight: 600;
+  color: var(--receipt-ink);
+}
+
 /* -- Folio (Atelier): kartu butik simetris dengan bingkai ganda -- */
 .receipt[data-layout="folio"] {
   padding: 2.4rem calc(var(--pad-x) + 0.6rem) calc(2rem + var(--zig));

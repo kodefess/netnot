@@ -145,6 +145,28 @@ function LayoutSketch({ theme }: { theme: Theme }) {
           </span>
         </span>
       );
+    case "hub": {
+      const seg = `color-mix(in srgb, ${ink} 14%, ${theme.paper})`;
+      return (
+        <span className="flex flex-col gap-[2px] p-2">
+          <span className="flex h-3.5 gap-[2px]">
+            <span className="w-3.5" style={{ background: accent }} />
+            <span className="flex flex-1 items-center justify-end pr-1" style={{ background: seg }}>
+              <span className="block h-1.5 w-3 border" style={{ borderColor: `${ink}55` }} />
+            </span>
+          </span>
+          <span className="mt-1 block" style={type("15px")}>Aa</span>
+          {[0, 1].map((i) => (
+            <span key={i} className="flex h-2.5 gap-[2px]">
+              <span className="w-2.5" style={{ background: seg }} />
+              <span className="flex flex-1 items-center justify-end pr-0.5" style={{ background: seg }}>
+                <span className="block h-1.5 w-4" style={{ background: theme.paper }} />
+              </span>
+            </span>
+          ))}
+        </span>
+      );
+    }
     case "folio":
       return (
         <span className="absolute inset-1.5 flex flex-col items-center border pt-1.5" style={{ borderColor: `${ink}99` }}>
