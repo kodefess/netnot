@@ -14,6 +14,7 @@ import {
   sumItems,
   thankYouMessages,
 } from "@/lib/receipt-utils";
+import { SITE } from "@/lib/site";
 import { DEFAULT_THEME, findTheme, randomTheme } from "@/lib/themes";
 
 export type ReceiptDraft = {
@@ -39,7 +40,10 @@ type Action =
   | { type: "update-item"; id: string; patch: Partial<Item> }
   | { type: "remove-item"; id: string };
 
-const STORAGE_KEY = "netnot:draft:v2";
+const STORAGE_KEY = "netnot:draft:v3";
+// Draft v2 dibuat sebelum ada logo default, jadi logo kosong di sana bukan
+// berarti pengguna menghapusnya.
+const LEGACY_STORAGE_KEY = "netnot:draft:v2";
 
 // Nilai deterministik untuk render pertama (server & client harus identik
 // supaya tidak hydration mismatch). Nilai acak/aktual disetel di effect.
@@ -53,7 +57,7 @@ const baseDraft = (): ReceiptDraft => ({
   items: initialItems(),
   themeId: DEFAULT_THEME.id,
   thanks: thankYouMessages[0],
-  logo: "",
+  logo: SITE.defaultLogo,
 });
 
 const freshDraft = (): ReceiptDraft => ({
@@ -89,7 +93,7 @@ function reducer(state: ReceiptDraft, action: Action): ReceiptDraft {
 }
 
 /** Validasi longgar untuk data dari localStorage (bisa basi / diubah manual). */
-function parseDraft(raw: string | null): ReceiptDraft | null {
+function parseDraft(raw: string | null, legacy = false): ReceiptDraft | null {
   if (!raw) return null;
   try {
     const data = JSON.parse(raw) as Partial<ReceiptDraft>;
@@ -121,7 +125,7 @@ function parseDraft(raw: string | null): ReceiptDraft | null {
       items,
       themeId: findTheme(data.themeId).id,
       thanks,
-      logo: str(data.logo, ""),
+      logo: str(data.logo, base.logo) || (legacy ? base.logo : ""),
     };
   } catch {
     return null;
@@ -132,9 +136,10 @@ function saveDraft(draft: ReceiptDraft) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   } catch {
-    // Kemungkinan kuota penuh karena logo (data URL). Simpan tanpa logo.
+    // Kemungkinan kuota penuh karena logo unggahan (data URL). Simpan dengan
+    // logo default, yang hanya berupa path pendek.
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...draft, logo: "" }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...draft, logo: SITE.defaultLogo }));
     } catch {
       // Storage tidak tersedia (private mode dsb.) — abaikan saja.
     }
@@ -147,10 +152,15 @@ export function useReceipt() {
 
   useEffect(() => {
     let stored: string | null = null;
+    let legacy: string | null = null;
     try {
       stored = localStorage.getItem(STORAGE_KEY);
+      legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
     } catch {}
-    dispatch({ type: "load", draft: parseDraft(stored) ?? freshDraft() });
+    dispatch({
+      type: "load",
+      draft: parseDraft(stored) ?? parseDraft(legacy, true) ?? freshDraft(),
+    });
     loaded.current = true;
   }, []);
 

@@ -148,25 +148,58 @@ function LayoutSketch({ theme }: { theme: Theme }) {
     case "hub": {
       const seg = `color-mix(in srgb, ${ink} 14%, ${theme.paper})`;
       return (
-        <span className="flex flex-col gap-[2px] p-2">
-          <span className="flex h-3.5 gap-[2px]">
-            <span className="w-3.5" style={{ background: accent }} />
-            <span className="flex flex-1 items-center justify-end pr-1" style={{ background: seg }}>
-              <span className="block h-1.5 w-3 border" style={{ borderColor: `${ink}55` }} />
-            </span>
+        <span className="flex h-full gap-[2px]">
+          {/* Sidebar rail: logo biru, tab aktif, kotak ikon. */}
+          <span className="flex w-3.5 flex-col gap-[2px]">
+            <span className="h-3.5" style={{ background: accent }} />
+            <span className="h-6" style={{ background: `color-mix(in srgb, ${ink} 24%, ${theme.paper})` }} />
+            <span className="flex-1" style={{ background: seg }} />
           </span>
-          <span className="mt-1 block" style={type("15px")}>Aa</span>
-          {[0, 1].map((i) => (
-            <span key={i} className="flex h-2.5 gap-[2px]">
-              <span className="w-2.5" style={{ background: seg }} />
-              <span className="flex flex-1 items-center justify-end pr-0.5" style={{ background: seg }}>
-                <span className="block h-1.5 w-4" style={{ background: theme.paper }} />
+          <span className="flex flex-1 flex-col gap-[2px] py-1.5 pr-2 pl-1">
+            <span className="block h-1 w-1/2" style={{ background: seg }} />
+            <span className="mt-0.5 block" style={type("14px")}>Aa</span>
+            {[0, 1].map((i) => (
+              <span key={i} className="flex items-center justify-between border-b pb-1" style={{ borderColor: seg }}>
+                {line("45%")}
+                {line("20%", 0.6)}
               </span>
-            </span>
-          ))}
+            ))}
+          </span>
         </span>
       );
     }
+    case "basement":
+      return (
+        <span className="block px-2.5 pt-2">
+          <span className="flex items-center justify-between">
+            <span style={{ ...type("8px"), fontFamily: "var(--font-archivo)", fontWeight: 800 }}>abc.</span>
+            <span className="block size-1 rounded-full" style={{ background: accent }} />
+          </span>
+          <span className="mt-1.5 block tracking-tighter" style={type("21px")}>Aa</span>
+          <span className="mt-1.5 grid grid-cols-2 gap-0.5">
+            {[0, 1].map((i) => (
+              <span key={i} className="flex h-4 items-end border p-0.5" style={{ borderColor: `${ink}33` }}>
+                <span className="block h-0.5 w-3" style={{ background: accent }} />
+              </span>
+            ))}
+          </span>
+        </span>
+      );
+    case "basement2":
+      return (
+        <span className="block px-2.5 pt-2">
+          <span className="block tracking-tighter" style={type("20px")}>Aa</span>
+          <span className="mt-1 block font-[family-name:var(--font-silkscreen)] text-[7px] leading-none" style={{ color: accent }}>
+            PAID
+          </span>
+          <span className="mt-1.5 grid gap-0.5">
+            {[0, 1].map((i) => (
+              <span key={i} className="block h-2 border" style={{ borderColor: `${ink}33` }} />
+            ))}
+          </span>
+          <span className="absolute inset-x-0 bottom-0 block h-1.5" style={{ background: accent }} />
+        </span>
+      );
     case "folio":
       return (
         <span className="absolute inset-1.5 flex flex-col items-center border pt-1.5" style={{ borderColor: `${ink}99` }}>

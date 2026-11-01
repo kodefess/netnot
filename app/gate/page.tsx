@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, CircleAlert, Eye, EyeOff, LoaderCircle, Lock } from "lucide-react";
+import {
+  ArrowRight,
+  CircleAlert,
+  Eye,
+  EyeOff,
+  FileLock2,
+  KeyRound,
+  LoaderCircle,
+  Lock,
+  ReceiptText,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { controlClass } from "@/components/studio/section";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +21,37 @@ type Status =
   | { kind: "loading" }
   | { kind: "error"; message: string }
   | { kind: "locked" };
+
+/** Nota wireframe biru, seperti ilustrasi wireframe di JOYCO Hub. */
+function WireReceipt() {
+  const width = 112;
+  const height = 150;
+  const teeth = 7;
+  const tooth = width / teeth;
+  let edge = `M0,0H${width}V${height}`;
+  for (let i = 0; i < teeth; i++) {
+    edge += `L${width - tooth * (i + 0.5)},${height - 7}L${width - tooth * (i + 1)},${height}`;
+  }
+  edge += "Z";
+  const rows = Array.from({ length: 8 }, (_, i) => 16 + i * 16);
+  const cols = [28, 56, 84];
+
+  return (
+    <svg viewBox="0 0 368 160" preserveAspectRatio="xMidYMid meet" aria-hidden>
+      <g transform="matrix(.82 .3 -.72 .5 196 22)">
+        {/* Salinan bergeser memberi kesan ketebalan kertas. */}
+        <path d={edge} transform="translate(-7 7)" opacity=".45" />
+        <path d={edge} />
+        {rows.map((y) => (
+          <path key={y} d={`M0,${y}H${width}`} opacity=".7" />
+        ))}
+        {cols.map((x) => (
+          <path key={x} d={`M${x},0V${height - 8}`} opacity=".7" />
+        ))}
+      </g>
+    </svg>
+  );
+}
 
 export default function GatePage() {
   const [password, setPassword] = useState("");
@@ -60,78 +98,113 @@ export default function GatePage() {
   };
 
   return (
-    <main className="canvas grid min-h-dvh place-items-center px-4 py-10">
-      <div className="w-full max-w-sm rounded-2xl border bg-surface p-7 shadow-panel sm:p-8">
-        <span
-          className={cn(
-            "mb-6 grid size-11 place-items-center rounded-xl",
-            locked ? "bg-danger/10 text-danger" : "bg-brand text-brand-foreground",
-          )}
-        >
-          <Lock className="size-5" />
+    <main className="gate">
+      <aside className="gate-rail" aria-hidden>
+        <span className="gate-logo">{SITE.brand.charAt(0)}</span>
+        <span className="gate-tab">
+          <span>Private</span>
+          <Lock size={15} />
         </span>
+        <span className="gate-box">
+          <ReceiptText size={15} />
+        </span>
+        <span className="gate-box">
+          <KeyRound size={15} />
+        </span>
+        <span className="gate-box">
+          <FileLock2 size={15} />
+        </span>
+        <span className="gate-fill" />
+        <span className="gate-box gate-diamond">
+          <svg viewBox="0 0 16 16">
+            <rect x="4" y="4" width="4" height="4" />
+            <rect x="8" y="8" width="4" height="4" className="is-blue" />
+            <rect x="8" y="4" width="4" height="4" className="is-dim" />
+            <rect x="4" y="8" width="4" height="4" className="is-dim" />
+          </svg>
+        </span>
+      </aside>
 
-        <h1 className="font-display text-3xl leading-tight">
-          {locked ? "Too many attempts" : <>Welcome to <em>{SITE.title}</em></>}
-        </h1>
-        <p className="mt-1.5 mb-6 text-sm text-muted-foreground">
-          {locked
-            ? "For security, sign-in is paused. Try again in about 10 minutes."
-            : "This studio is private. Enter the password to continue."}
-        </p>
-
-        <form onSubmit={submit} className="flex flex-col gap-3">
-          <div className="relative">
-            <Input
-              id="password"
-              type={visible ? "text" : "password"}
-              aria-label="Password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (status.kind === "error") setStatus({ kind: "idle" });
-              }}
-              autoComplete="current-password"
-              autoFocus
-              disabled={locked}
-              aria-invalid={status.kind === "error" || undefined}
-              className={cn(controlClass, "h-11 pr-11")}
-            />
-            <button
-              type="button"
-              onClick={() => setVisible((v) => !v)}
-              aria-label={visible ? "Hide password" : "Show password"}
-              disabled={locked}
-              className="absolute inset-y-0 right-0 grid w-11 place-items-center text-muted-foreground hover:text-foreground disabled:opacity-50"
-            >
-              {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
+      <div className="gate-stage">
+        <div className="gate-card">
+          <div className="gate-strip">
+            <span className={cn("gate-icon", locked && "is-locked")}>
+              <Lock size={15} />
+            </span>
+            <span className="gate-label">
+              {locked ? "Access paused" : "Private studio"}
+              <kbd>{locked ? "10 MIN" : "↵"}</kbd>
+            </span>
           </div>
 
-          {status.kind === "error" && (
-            <p role="alert" className="flex items-center gap-2 text-[13px] text-danger">
-              <CircleAlert className="size-4 shrink-0" />
-              {status.message}
-            </p>
-          )}
+          <div className="gate-art">
+            <i className="gate-corner is-tl" />
+            <i className="gate-corner is-tr" />
+            <i className="gate-corner is-bl" />
+            <i className="gate-corner is-br" />
+            <WireReceipt />
+          </div>
 
-          <Button
-            type="submit"
-            disabled={!password || loading || locked}
-            className="h-11 gap-2 rounded-lg text-[15px]"
-          >
-            {loading ? (
-              <>
-                <LoaderCircle className="size-4 animate-spin" /> Checking…
-              </>
-            ) : (
-              <>
-                Continue <ArrowRight className="size-4" />
-              </>
-            )}
-          </Button>
-        </form>
+          <div className="gate-body">
+            <span className="gate-chip">{locked ? "Locked" : "Sign in"}</span>
+            <h1>{locked ? "Too many attempts" : SITE.title}</h1>
+            <p>
+              {locked
+                ? "For security, sign-in is paused. Try again in about 10 minutes."
+                : "This studio is private. Enter the password to continue."}
+            </p>
+
+            <form onSubmit={submit} className="gate-form">
+              <div className="gate-field">
+                <input
+                  id="password"
+                  className="gate-input"
+                  type={visible ? "text" : "password"}
+                  aria-label="Password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (status.kind === "error") setStatus({ kind: "idle" });
+                  }}
+                  autoComplete="current-password"
+                  autoFocus
+                  disabled={locked}
+                  aria-invalid={status.kind === "error" || undefined}
+                />
+                <button
+                  type="button"
+                  className="gate-eye"
+                  onClick={() => setVisible((v) => !v)}
+                  aria-label={visible ? "Hide password" : "Show password"}
+                  disabled={locked}
+                >
+                  {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+
+              {status.kind === "error" && (
+                <p role="alert" className="gate-error">
+                  <CircleAlert size={15} className="shrink-0" />
+                  {status.message}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="gate-submit"
+                disabled={!password || loading || locked}
+              >
+                {loading ? "Checking…" : "Continue"}
+                {loading ? (
+                  <LoaderCircle size={16} className="animate-spin" />
+                ) : (
+                  <ArrowRight size={16} />
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </main>
   );
