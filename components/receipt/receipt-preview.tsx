@@ -1,4 +1,4 @@
-import { CalendarDays, Check, Package, ReceiptText, WalletCards } from "lucide-react";
+import { Check, ReceiptText } from "lucide-react";
 
 import { PaidSeal, type SealTone, sealCode, sealHash } from "@/components/receipt/paid-seal";
 import type { ReceiptDraft } from "@/hooks/use-receipt";
@@ -606,15 +606,6 @@ function Hub(ctx: Ctx) {
           <span>Receipt</span>
           <ReceiptText size={13} />
         </span>
-        <span className="hub-box">
-          <CalendarDays size={13} />
-        </span>
-        <span className="hub-box">
-          <WalletCards size={13} />
-        </span>
-        <span className="hub-box">
-          <Package size={13} />
-        </span>
         <span className="hub-rail-fill" />
         <span className="hub-box hub-diamond">
           <svg viewBox="0 0 16 16">
@@ -633,27 +624,14 @@ function Hub(ctx: Ctx) {
         </header>
 
         <h2 className="hub-title">{draft.store || "Your store"}</h2>
-
-        <dl className="hub-meta">
-          <div>
-            <dt>Receipt no.</dt>
-            <dd>#{draft.order || "0000"}</dd>
-          </div>
-          <div>
-            <dt>Date</dt>
-            <dd>{draft.date || "—"}</dd>
-          </div>
-          <div>
-            <dt>Paid via</dt>
-            <dd>{draft.payment || "—"}</dd>
-          </div>
-        </dl>
+        <p className="hub-sub">
+          {draft.date || "—"} · #{draft.order || "0000"} · {draft.payment || "—"}
+        </p>
 
         {draft.items.length ? (
           <div className="hub-list">
-            {draft.items.map((item, i) => (
+            {draft.items.map((item) => (
               <div className="hub-row" key={item.id}>
-                <span className="hub-index">{String(i + 1).padStart(2, "0")}</span>
                 <div>
                   <strong>{item.name || "Untitled item"}</strong>
                   <small>
@@ -678,7 +656,7 @@ function Hub(ctx: Ctx) {
             <small>
               Total paid · {count} {count === 1 ? "item" : "items"}
             </small>
-            <strong style={fitAmount(money(total, draft.currency), 1.65, 10.5)}>
+            <strong style={fitAmount(money(total, draft.currency), 1.75, 10.5)}>
               {money(total, draft.currency)}
             </strong>
           </div>

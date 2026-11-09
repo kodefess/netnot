@@ -2,8 +2,7 @@
 
 import { Check, Palette, Shuffle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Section } from "@/components/studio/section";
+import { Section, segButton } from "@/components/studio/section";
 import type { ReceiptStore } from "@/hooks/use-receipt";
 import { type Theme, randomTheme, themes } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -13,22 +12,24 @@ export function StyleSection({ receipt }: { receipt: ReceiptStore }) {
 
   return (
     <Section
+      id="style"
       icon={Palette}
       title="Style"
+      meta={themes.length}
       description="All in brand blue — each style has its own layout and typeface."
       actions={
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => set("themeId", randomTheme(theme.id).id)}
-          className="h-8 gap-1.5 px-2.5 text-[13px] text-muted-foreground hover:text-foreground"
+          title="Pick a random style"
+          className={segButton}
         >
-          <Shuffle className="size-3.5" /> Surprise me
-        </Button>
+          <Shuffle className="size-3.5" />
+          <span className="hidden sm:inline">Surprise me</span>
+        </button>
       }
     >
-      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 xl:grid-cols-4">
         {themes.map((t) => (
           <ThemeTile
             key={t.id}
@@ -58,8 +59,8 @@ function ThemeTile({
       aria-checked={active}
       onClick={onSelect}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border bg-surface text-left transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-panel",
-        active && "border-brand ring-2 ring-brand/25 hover:border-brand",
+        "group relative flex flex-col overflow-hidden bg-surface-2 text-left -outline-offset-[1.5px] transition-colors hover:bg-surface-3",
+        active && "outline-[1.5px] outline-brand outline-solid",
       )}
     >
       {/* Mini nota: semua tema biru, jadi yang ditonjolkan adalah susunan
@@ -76,13 +77,15 @@ function ThemeTile({
       >
         <LayoutSketch theme={theme} />
         {active && (
-          <span className="absolute top-2.5 right-2 grid size-5 place-items-center rounded-full bg-brand text-brand-foreground">
+          <span className="absolute top-0 right-0 grid size-5 place-items-center bg-brand text-brand-foreground">
             <Check className="size-3" strokeWidth={3} />
           </span>
         )}
       </span>
-      <span className="block border-t px-3 py-2">
-        <span className="block text-[13px] font-semibold">{theme.name}</span>
+      <span className="block px-2.5 py-2">
+        <span className="block truncate font-mono text-[11px] font-semibold tracking-[0.04em] uppercase">
+          {theme.name}
+        </span>
         <span className="block truncate text-xs text-muted-foreground">{theme.vibe}</span>
       </span>
     </button>
@@ -133,7 +136,7 @@ function LayoutSketch({ theme }: { theme: Theme }) {
       return (
         <span className="block px-2.5 pt-2.5">
           <span
-            className="relative flex aspect-[1.586] w-full flex-col justify-between overflow-hidden rounded-md p-1.5"
+            className="relative flex aspect-[1.586] w-full flex-col justify-between overflow-hidden rounded-[5px] p-1.5"
             style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 72%, #000))` }}
           >
             <span className="flex items-center gap-1">
