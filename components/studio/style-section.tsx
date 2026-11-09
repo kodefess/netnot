@@ -2,8 +2,7 @@
 
 import { Check, Palette, Shuffle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Section } from "@/components/studio/section";
+import { Section, segButton } from "@/components/studio/section";
 import type { ReceiptStore } from "@/hooks/use-receipt";
 import { type Theme, randomTheme, themes } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -13,22 +12,24 @@ export function StyleSection({ receipt }: { receipt: ReceiptStore }) {
 
   return (
     <Section
+      id="style"
       icon={Palette}
       title="Style"
+      meta={themes.length}
       description="All in brand blue — each style has its own layout and typeface."
       actions={
-        <Button
+        <button
           type="button"
-          variant="ghost"
-          size="sm"
           onClick={() => set("themeId", randomTheme(theme.id).id)}
-          className="h-8 gap-1.5 px-2.5 text-[13px] text-muted-foreground hover:text-foreground"
+          title="Pick a random style"
+          className={segButton}
         >
-          <Shuffle className="size-3.5" /> Surprise me
-        </Button>
+          <Shuffle className="size-3.5" />
+          <span className="hidden sm:inline">Surprise me</span>
+        </button>
       }
     >
-      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 xl:grid-cols-4">
         {themes.map((t) => (
           <ThemeTile
             key={t.id}
@@ -58,8 +59,8 @@ function ThemeTile({
       aria-checked={active}
       onClick={onSelect}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border bg-surface text-left transition-all hover:-translate-y-0.5 hover:border-border-strong hover:shadow-panel",
-        active && "border-brand ring-2 ring-brand/25 hover:border-brand",
+        "group relative flex flex-col overflow-hidden bg-surface-2 text-left -outline-offset-[1.5px] transition-colors hover:bg-surface-3",
+        active && "outline-[1.5px] outline-brand outline-solid",
       )}
     >
       {/* Mini nota: semua tema biru, jadi yang ditonjolkan adalah susunan
@@ -76,13 +77,15 @@ function ThemeTile({
       >
         <LayoutSketch theme={theme} />
         {active && (
-          <span className="absolute top-2.5 right-2 grid size-5 place-items-center rounded-full bg-brand text-brand-foreground">
+          <span className="absolute top-0 right-0 grid size-5 place-items-center bg-brand text-brand-foreground">
             <Check className="size-3" strokeWidth={3} />
           </span>
         )}
       </span>
-      <span className="block border-t px-3 py-2">
-        <span className="block text-[13px] font-semibold">{theme.name}</span>
+      <span className="block px-2.5 py-2">
+        <span className="block truncate font-mono text-[11px] font-semibold tracking-[0.04em] uppercase">
+          {theme.name}
+        </span>
         <span className="block truncate text-xs text-muted-foreground">{theme.vibe}</span>
       </span>
     </button>
@@ -133,7 +136,7 @@ function LayoutSketch({ theme }: { theme: Theme }) {
       return (
         <span className="block px-2.5 pt-2.5">
           <span
-            className="relative flex aspect-[1.586] w-full flex-col justify-between overflow-hidden rounded-md p-1.5"
+            className="relative flex aspect-[1.586] w-full flex-col justify-between overflow-hidden rounded-[5px] p-1.5"
             style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 72%, #000))` }}
           >
             <span className="flex items-center gap-1">
@@ -148,25 +151,58 @@ function LayoutSketch({ theme }: { theme: Theme }) {
     case "hub": {
       const seg = `color-mix(in srgb, ${ink} 14%, ${theme.paper})`;
       return (
-        <span className="flex flex-col gap-[2px] p-2">
-          <span className="flex h-3.5 gap-[2px]">
-            <span className="w-3.5" style={{ background: accent }} />
-            <span className="flex flex-1 items-center justify-end pr-1" style={{ background: seg }}>
-              <span className="block h-1.5 w-3 border" style={{ borderColor: `${ink}55` }} />
-            </span>
+        <span className="flex h-full gap-[2px]">
+          {/* Sidebar rail: logo biru, tab aktif, kotak ikon. */}
+          <span className="flex w-3.5 flex-col gap-[2px]">
+            <span className="h-3.5" style={{ background: accent }} />
+            <span className="h-6" style={{ background: `color-mix(in srgb, ${ink} 24%, ${theme.paper})` }} />
+            <span className="flex-1" style={{ background: seg }} />
           </span>
-          <span className="mt-1 block" style={type("15px")}>Aa</span>
-          {[0, 1].map((i) => (
-            <span key={i} className="flex h-2.5 gap-[2px]">
-              <span className="w-2.5" style={{ background: seg }} />
-              <span className="flex flex-1 items-center justify-end pr-0.5" style={{ background: seg }}>
-                <span className="block h-1.5 w-4" style={{ background: theme.paper }} />
+          <span className="flex flex-1 flex-col gap-[2px] py-1.5 pr-2 pl-1">
+            <span className="block h-1 w-1/2" style={{ background: seg }} />
+            <span className="mt-0.5 block" style={type("14px")}>Aa</span>
+            {[0, 1].map((i) => (
+              <span key={i} className="flex items-center justify-between border-b pb-1" style={{ borderColor: seg }}>
+                {line("45%")}
+                {line("20%", 0.6)}
               </span>
-            </span>
-          ))}
+            ))}
+          </span>
         </span>
       );
     }
+    case "basement":
+      return (
+        <span className="block px-2.5 pt-2">
+          <span className="flex items-center justify-between">
+            <span style={{ ...type("8px"), fontFamily: "var(--font-archivo)", fontWeight: 800 }}>abc.</span>
+            <span className="block size-1 rounded-full" style={{ background: accent }} />
+          </span>
+          <span className="mt-1.5 block tracking-tighter" style={type("21px")}>Aa</span>
+          <span className="mt-1.5 grid grid-cols-2 gap-0.5">
+            {[0, 1].map((i) => (
+              <span key={i} className="flex h-4 items-end border p-0.5" style={{ borderColor: `${ink}33` }}>
+                <span className="block h-0.5 w-3" style={{ background: accent }} />
+              </span>
+            ))}
+          </span>
+        </span>
+      );
+    case "basement2":
+      return (
+        <span className="block px-2.5 pt-2">
+          <span className="block tracking-tighter" style={type("20px")}>Aa</span>
+          <span className="mt-1 block font-[family-name:var(--font-silkscreen)] text-[7px] leading-none" style={{ color: accent }}>
+            PAID
+          </span>
+          <span className="mt-1.5 grid gap-0.5">
+            {[0, 1].map((i) => (
+              <span key={i} className="block h-2 border" style={{ borderColor: `${ink}33` }} />
+            ))}
+          </span>
+          <span className="absolute inset-x-0 bottom-0 block h-1.5" style={{ background: accent }} />
+        </span>
+      );
     case "folio":
       return (
         <span className="absolute inset-1.5 flex flex-col items-center border pt-1.5" style={{ borderColor: `${ink}99` }}>

@@ -12,6 +12,8 @@ export type ReceiptPattern = "none" | "dots" | "grid";
  * - swiss:   grid presisi bergaris hairline, item bernomor, total besar.
  * - card:    kartu pembayaran biru (chip, nomor, pola gelombang) di atas, item di bawah.
  * - hub:     gaya JOYCO Hub — strip segmen kotak, label mono, badge, kartu wireframe.
+ * - basement: nuansa basement.studio — wordmark, nominal raksasa, grid sel, toggle pill.
+ * - basement2: sel bertitik sudut, label piksel, arsir diagonal, pita garis polisi.
  * - folio:   kartu butik — bingkai ganda, monogram, serif miring, simetris.
  */
 export type ReceiptLayout =
@@ -24,7 +26,9 @@ export type ReceiptLayout =
   | "swiss"
   | "card"
   | "folio"
-  | "hub";
+  | "hub"
+  | "basement"
+  | "basement2";
 
 export type Theme = {
   id: string;
@@ -92,6 +96,35 @@ export const themes: Theme[] = [
     onAccent: white,
     paper: "#fafafa",
     font: "var(--font-public-sans)",
+    weight: 600,
+    radius: "0px",
+    pattern: "none",
+  },
+  // Nuansa basement.studio: hitam pekat, Geist rapat, satu aksen oranye.
+  {
+    id: "basement",
+    name: "Basement",
+    vibe: "Pitch black, loud orange",
+    layout: "basement",
+    ink: "#e6e6e6",
+    accent: "#ff4d00",
+    onAccent: "#000000",
+    paper: "#000000",
+    font: "var(--font-geist)",
+    weight: 600,
+    radius: "0px",
+    pattern: "none",
+  },
+  {
+    id: "basement-v2",
+    name: "Basement v2",
+    vibe: "Police tape, pixel labels",
+    layout: "basement2",
+    ink: "#e6e6e6",
+    accent: "#ff4d00",
+    onAccent: "#000000",
+    paper: "#000000",
+    font: "var(--font-geist)",
     weight: 600,
     radius: "0px",
     pattern: "none",

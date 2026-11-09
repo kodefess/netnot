@@ -13,7 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/toast";
-import { FieldShell, Section, TextField, controlClass } from "@/components/studio/section";
+import {
+  FieldShell,
+  Section,
+  TextField,
+  boxClass,
+  controlClass,
+  segButton,
+} from "@/components/studio/section";
 import type { ReceiptStore } from "@/hooks/use-receipt";
 import { currencies, isoToFlag, pickThankYou } from "@/lib/receipt-utils";
 import { cn } from "@/lib/utils";
@@ -54,7 +61,7 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
   };
 
   return (
-    <Section icon={Store} title="Details" description="Who's selling, and how it was paid.">
+    <Section id="details" icon={Store} title="Details" description="Who's selling, and how it was paid.">
       <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
         <TextField
           id="store-name"
@@ -84,21 +91,20 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
           onChange={(v) => set("order", v)}
           placeholder="0001"
           suffix={
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={generateNumber}
               disabled={generating}
-              className="h-8 gap-1.5 px-2.5 text-[13px] text-muted-foreground hover:text-foreground"
+              title="Generate a receipt number"
+              className={segButton}
             >
               {generating ? (
                 <LoaderCircle className="size-3.5 animate-spin" />
               ) : (
                 <Hash className="size-3.5" />
               )}
-              Generate
-            </Button>
+              <span className="hidden sm:inline">Generate</span>
+            </button>
           }
         />
         <TextField
@@ -134,8 +140,8 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
         </FieldShell>
 
         <FieldShell id="thanks-1" label="Closing note" className="sm:col-span-2">
-          <div className="flex gap-2">
-            <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
+          <div className="flex gap-[2px]">
+            <div className="grid min-w-0 flex-1 gap-[2px] sm:grid-cols-2">
               <Input
                 id="thanks-1"
                 value={draft.thanks[0]}
@@ -156,7 +162,7 @@ export function DetailsSection({ receipt }: { receipt: ReceiptStore }) {
               onClick={() => set("thanks", pickThankYou(draft.thanks))}
               aria-label="Suggest another closing note"
               title="Suggest another"
-              className="size-10 shrink-0 rounded-lg border-input bg-surface"
+              className={cn(boxClass, "h-auto border-0 hover:bg-surface-3 hover:text-foreground")}
             >
               <Dices className="size-4" />
             </Button>
@@ -202,9 +208,9 @@ function LogoField({
         }}
       />
       {logo ? (
-        <div className="flex items-center gap-3 rounded-lg border border-input p-2">
+        <div className="flex items-center gap-3 bg-surface-2 p-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logo} alt="Logo preview" className="size-10 rounded-md object-cover" />
+          <img src={logo} alt="Logo preview" className="size-10 object-cover" />
           <span className="flex-1 text-sm text-muted-foreground">Logo added</span>
           <Button type="button" variant="ghost" size="sm" onClick={() => inputRef.current?.click()}>
             Replace
@@ -235,11 +241,11 @@ function LogoField({
             readFile(e.dataTransfer.files?.[0]);
           }}
           className={cn(
-            "flex items-center gap-3 rounded-lg border border-dashed border-input px-3 py-3 text-left transition-colors hover:border-foreground/30 hover:bg-surface-2",
-            dragging && "border-brand bg-brand/5",
+            "flex items-center gap-3 border border-dashed border-border-strong bg-surface-2/50 px-3 py-3 text-left transition-colors hover:bg-surface-2",
+            dragging && "border-brand bg-brand/10",
           )}
         >
-          <span className="grid size-9 place-items-center rounded-md bg-surface-2 text-muted-foreground">
+          <span className="grid size-9 place-items-center bg-surface-3 text-muted-foreground">
             <ImageUp className="size-4" />
           </span>
           <span className="text-sm">

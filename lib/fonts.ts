@@ -7,6 +7,7 @@ import {
   Public_Sans,
   Roboto_Mono,
   Rubik,
+  Silkscreen,
   Sora,
   Space_Grotesk,
 } from "next/font/google";
@@ -16,10 +17,16 @@ import {
 // nama variable-nya (lihat lib/themes.ts). Variable dinamai sesuai font,
 // bukan sesuai tema, supaya satu font bisa dipakai ulang oleh tema lain.
 
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
+const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-archivo" });
 // Pasangan typeface JOYCO Hub: Public Sans (judul/isi) + Roboto Mono (label).
 const publicSans = Public_Sans({ subsets: ["latin"], variable: "--font-public-sans" });
 const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: "--font-roboto-mono" });
+// Font piksel lebar untuk label Basement v2.
+const silkscreen = Silkscreen({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-silkscreen",
+});
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora" });
 const rubik = Rubik({ subsets: ["latin"], variable: "--font-rubik" });
 const bricolage = Bricolage_Grotesque({
@@ -50,6 +57,7 @@ export const fontVariables = [
   instrumentSerif,
   archivo,
   sora,
+  silkscreen,
   publicSans,
   robotoMono,
   rubik,

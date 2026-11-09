@@ -1,5 +1,20 @@
 import { useId } from "react";
 
+export type SealTone = "blue" | "orange";
+
+const FOILS: Record<SealTone, { stops: string[]; dark: string; main: string }> = {
+  blue: {
+    stops: ["#1337ff", "#7d93ff", "#dfe6ff", "#5f7bff", "#1337ff", "#b9c6ff", "#3355ff"],
+    dark: "#0a0f33",
+    main: "#1337ff",
+  },
+  orange: {
+    stops: ["#ff4d00", "#ff9a6b", "#ffe3d6", "#ff8047", "#ff4d00", "#ffc7ad", "#ff6a26"],
+    dark: "#1a0a03",
+    main: "#ff4d00",
+  },
+};
+
 /** FNV-1a 32-bit — hash kecil & deterministik untuk seed pola segel. */
 export function sealHash(input: string) {
   let h = 0x811c9dc5;
@@ -58,8 +73,17 @@ function starburst(points: number, outer: number, inner: number) {
  * tanggal, toko, total), jadi tiap nota punya segel unik dan mengubah
  * datanya otomatis mengubah segelnya.
  */
-export function PaidSeal({ seed, microText }: { seed: string; microText: string }) {
+export function PaidSeal({
+  seed,
+  microText,
+  tone = "blue",
+}: {
+  seed: string;
+  microText: string;
+  tone?: SealTone;
+}) {
   const id = useId().replace(/:/g, "");
+  const foil = FOILS[tone];
   const rand = rng(sealHash(seed));
 
   const points = 26 + Math.floor(rand() * 10);
@@ -90,14 +114,9 @@ export function PaidSeal({ seed, microText }: { seed: string; microText: string 
           gradientUnits="userSpaceOnUse"
           gradientTransform={`rotate(${angle})`}
         >
-          {/* Foil biru brand: #1337FF dengan pantulan terang di antaranya. */}
-          <stop offset="0" stopColor="#1337ff" />
-          <stop offset="0.2" stopColor="#7d93ff" />
-          <stop offset="0.36" stopColor="#dfe6ff" />
-          <stop offset="0.5" stopColor="#5f7bff" />
-          <stop offset="0.66" stopColor="#1337ff" />
-          <stop offset="0.82" stopColor="#b9c6ff" />
-          <stop offset="1" stopColor="#3355ff" />
+          {foil.stops.map((color, i) => (
+            <stop key={i} offset={i / (foil.stops.length - 1)} stopColor={color} />
+          ))}
         </linearGradient>
         <linearGradient id={`${id}-sheen`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0.3" stopColor="#fff" stopOpacity="0" />
@@ -111,12 +130,12 @@ export function PaidSeal({ seed, microText }: { seed: string; microText: string 
       <path
         d={starburst(points, 49.5, 45.5)}
         fill="none"
-        stroke="#0a0f33"
+        stroke={foil.dark}
         strokeOpacity="0.35"
         strokeWidth="0.6"
       />
       {/* Pita navy tempat teks mikro, supaya tetap terbaca di atas foil. */}
-      <circle r="40.6" fill="none" stroke="#0a0f33" strokeWidth="6.2" />
+      <circle r="40.6" fill="none" stroke={foil.dark} strokeWidth="6.2" />
       <circle r="44" fill="none" stroke="#ffffff" strokeOpacity="0.7" strokeWidth="0.4" />
       <circle r="37.2" fill="none" stroke="#ffffff" strokeOpacity="0.7" strokeWidth="0.4" />
 
@@ -126,22 +145,22 @@ export function PaidSeal({ seed, microText }: { seed: string; microText: string 
 
       <g fill="none" strokeWidth="0.32">
         {outerBand.map((d, i) => (
-          <path key={`o${i}`} d={d} stroke={i % 2 ? "#ffffff" : "#0a0f33"} strokeOpacity={i % 2 ? 0.9 : 0.45} />
+          <path key={`o${i}`} d={d} stroke={i % 2 ? "#ffffff" : foil.dark} strokeOpacity={i % 2 ? 0.9 : 0.45} />
         ))}
         {innerBand.map((d, i) => (
-          <path key={`i${i}`} d={d} stroke={i % 2 ? "#0a0f33" : "#ffffff"} strokeOpacity={i % 2 ? 0.45 : 0.9} />
+          <path key={`i${i}`} d={d} stroke={i % 2 ? foil.dark : "#ffffff"} strokeOpacity={i % 2 ? 0.45 : 0.9} />
         ))}
       </g>
 
       <circle r="17" fill="#ffffff" fillOpacity="0.9" />
-      <circle r="17" fill="none" stroke="#0a0f33" strokeOpacity="0.55" strokeWidth="0.5" />
+      <circle r="17" fill="none" stroke={foil.dark} strokeOpacity="0.55" strokeWidth="0.5" />
       <text
         y="1.2"
         textAnchor="middle"
         fontSize="9"
         fontWeight="800"
         letterSpacing="0.4"
-        fill="#1337ff"
+        fill={foil.main}
       >
         PAID
       </text>
@@ -151,12 +170,12 @@ export function PaidSeal({ seed, microText }: { seed: string; microText: string 
         fontSize="3.6"
         fontWeight="700"
         letterSpacing="1.4"
-        fill="#0a0f33"
+        fill={foil.dark}
         fillOpacity="0.75"
       >
         LUNAS
       </text>
-      <path d={starburst(5, 3.2, 1.35)} fill="#1337ff" transform="translate(0 -10)" />
+      <path d={starburst(5, 3.2, 1.35)} fill={foil.main} transform="translate(0 -10)" />
 
       {/* Kilau diagonal — memberi kesan foil hologram. */}
       <path d={starburst(points, 49.5, 45.5)} fill={`url(#${id}-sheen)`} className="paid-seal-sheen" />

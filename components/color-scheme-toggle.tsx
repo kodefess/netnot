@@ -3,8 +3,6 @@
 import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-
 const STORAGE_KEY = "netnot:color-scheme";
 
 // Dijalankan inline di <head> sebelum paint supaya tidak ada kilatan tema
@@ -31,16 +29,15 @@ export function ColorSchemeToggle() {
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
+    <button
+      type="button"
       onClick={toggle}
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
-      className="size-9 rounded-full text-muted-foreground hover:text-foreground"
+      className="grid w-[3.25rem] shrink-0 place-items-center bg-surface-2 text-muted-foreground transition-colors hover:bg-surface-3 hover:text-foreground"
     >
       <Sun className="size-4 dark:hidden" />
       <Moon className="hidden size-4 dark:block" />
-    </Button>
+    </button>
   );
 }

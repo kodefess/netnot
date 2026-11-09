@@ -1,6 +1,6 @@
-import { CalendarDays, Check, ChevronDown, Package, ReceiptText, WalletCards } from "lucide-react";
+import { Check, ReceiptText } from "lucide-react";
 
-import { PaidSeal, sealCode, sealHash } from "@/components/receipt/paid-seal";
+import { PaidSeal, type SealTone, sealCode, sealHash } from "@/components/receipt/paid-seal";
 import type { ReceiptDraft } from "@/hooks/use-receipt";
 import { money, sumItems } from "@/lib/receipt-utils";
 import type { Theme } from "@/lib/themes";
@@ -98,11 +98,18 @@ function Title({ draft }: Ctx) {
   );
 }
 
-function Seal({ draft, seed, code, className }: Ctx & { className?: string }) {
+function Seal({
+  draft,
+  seed,
+  code,
+  className,
+  tone,
+}: Ctx & { className?: string; tone?: SealTone }) {
   return (
     <div className={cn("receipt-stamp", className)}>
       <PaidSeal
         seed={seed}
+        tone={tone}
         microText={`PAID IN FULL • LUNAS • #${draft.order || "0000"} • ${draft.date} • ${code}`}
       />
     </div>
@@ -173,6 +180,11 @@ function Code({ code }: Ctx) {
 }
 
 const Rule = () => <div className="receipt-rule" />;
+
+/** Ukuran font nominal: mengecil sesuai panjang teks supaya tetap satu baris. */
+const fitAmount = (amount: string, maxRem: number, widthRem: number) => ({
+  fontSize: `min(${maxRem}rem, ${(widthRem / (amount.length * 0.56)).toFixed(2)}rem)`,
+});
 
 /** Barcode dekoratif yang lebar batangnya diturunkan dari data nota. */
 function Barcode({ seed }: Ctx) {
@@ -469,7 +481,9 @@ function Swiss(ctx: Ctx) {
       <div className="swiss-total">
         <div>
           <span className="swiss-label">Amount paid</span>
-          <strong>{money(total, draft.currency)}</strong>
+          <strong style={fitAmount(money(total, draft.currency), 2, 13.5)}>
+            {money(total, draft.currency)}
+          </strong>
         </div>
         <Seal {...ctx} className="is-inline" />
       </div>
@@ -542,7 +556,9 @@ function Card(ctx: Ctx) {
       <div className="card-amount">
         <div>
           <p className="receipt-kicker">{draft.title || "Payment receipt"}</p>
-          <strong>{money(total, draft.currency)}</strong>
+          <strong style={fitAmount(money(total, draft.currency), 2, 13.5)}>
+            {money(total, draft.currency)}
+          </strong>
           <small>
             {count} {count === 1 ? "item" : "items"} · {draft.currency}
           </small>
@@ -590,15 +606,6 @@ function Hub(ctx: Ctx) {
           <span>Receipt</span>
           <ReceiptText size={13} />
         </span>
-        <span className="hub-box">
-          <CalendarDays size={13} />
-        </span>
-        <span className="hub-box">
-          <WalletCards size={13} />
-        </span>
-        <span className="hub-box">
-          <Package size={13} />
-        </span>
         <span className="hub-rail-fill" />
         <span className="hub-box hub-diamond">
           <svg viewBox="0 0 16 16">
@@ -611,57 +618,28 @@ function Hub(ctx: Ctx) {
       </aside>
 
       <div className="hub-main">
-        <div className="hub-crumb">
-          <span className="hub-crumb-icon" aria-hidden>
-            <svg viewBox="0 0 16 16">
-              <path d="M8 1.5 14 5v6l-6 3.5L2 11V5z" />
-            </svg>
-          </span>
-          <span className="hub-crumb-text">
-            <b>Receipt</b>
-            <span>
-              #{draft.order || "0000"} / Details
-            </span>
-          </span>
-          <ChevronDown size={12} aria-hidden />
-        </div>
+        <header className="hub-head">
+          <span>{draft.title || "Payment receipt"}</span>
+          <span className="hub-paid">Paid</span>
+        </header>
 
-        <div className="hub-chips">
-          <span className="hub-chip">{draft.title || "Payment receipt"}</span>
-          <span className="hub-chip is-blue">Paid</span>
-        </div>
         <h2 className="hub-title">{draft.store || "Your store"}</h2>
+        <p className="hub-sub">
+          {draft.date || "—"} · #{draft.order || "0000"} · {draft.payment || "—"}
+        </p>
 
-        <div className="hub-toolbar">
-          <span className="hub-btn">
-            <CalendarDays size={12} aria-hidden />
-            {draft.date || "—"}
-          </span>
-          <span className="hub-btn">
-            <WalletCards size={12} aria-hidden />
-            {draft.payment || "—"}
-          </span>
-        </div>
-
-        <div className="hub-section">
-          <h3>Items</h3>
-          <span className="hub-count">{count}</span>
-        </div>
         {draft.items.length ? (
           <div className="hub-list">
-            {draft.items.map((item, i) => (
-              <div className="hub-strip" key={item.id}>
-                <span className="hub-box">{String(i + 1).padStart(2, "0")}</span>
-                <span className="hub-seg hub-grow is-item">
-                  <span className="hub-item">
-                    <span className="hub-name">{item.name || "Untitled item"}</span>
-                    <small>
-                      {item.qty} × {money(item.price, draft.currency)}
-                      {item.detail && ` · ${item.detail}`}
-                    </small>
-                  </span>
-                  <span className="hub-badge">{money(item.qty * item.price, draft.currency)}</span>
-                </span>
+            {draft.items.map((item) => (
+              <div className="hub-row" key={item.id}>
+                <div>
+                  <strong>{item.name || "Untitled item"}</strong>
+                  <small>
+                    {item.qty} × {money(item.price, draft.currency)}
+                    {item.detail && ` · ${item.detail}`}
+                  </small>
+                </div>
+                <span>{money(item.qty * item.price, draft.currency)}</span>
               </div>
             ))}
           </div>
@@ -669,46 +647,205 @@ function Hub(ctx: Ctx) {
           <p className="receipt-empty">No items yet</p>
         )}
 
-        <div className="hub-card">
-          <div className="hub-strip">
-            <span className="hub-box" aria-hidden>
-              Σ
-            </span>
-            <span className="hub-seg hub-grow">
-              Total paid
-              <span className="hub-badge">{draft.currency}</span>
-            </span>
+        <div className="hub-total">
+          <i className="hub-corner is-tl" />
+          <i className="hub-corner is-tr" />
+          <i className="hub-corner is-bl" />
+          <i className="hub-corner is-br" />
+          <div>
+            <small>
+              Total paid · {count} {count === 1 ? "item" : "items"}
+            </small>
+            <strong style={fitAmount(money(total, draft.currency), 1.75, 10.5)}>
+              {money(total, draft.currency)}
+            </strong>
           </div>
-          <div className="hub-card-body">
-            <i className="hub-corner is-tl" />
-            <i className="hub-corner is-tr" />
-            <i className="hub-corner is-bl" />
-            <i className="hub-corner is-br" />
-            <div>
-              <small>
-                {count} {count === 1 ? "item" : "items"}
-              </small>
-              <strong>{money(total, draft.currency)}</strong>
-            </div>
-            <Seal {...ctx} className="is-inline" />
-          </div>
+          <Seal {...ctx} className="is-inline" />
         </div>
 
-        <div className="hub-foot">
-          {(first || second) && (
-            <p className="hub-note">
-              {first}
-              {first && second && " "}
-              {second}
-            </p>
-          )}
-          <div className="hub-strip hub-meta">
-            <span className="hub-seg hub-grow">Seal</span>
-            <span className="hub-seg">{code}</span>
-          </div>
-        </div>
+        {(first || second) && (
+          <p className="hub-note">
+            {first}
+            {first && second && <br />}
+            {second}
+          </p>
+        )}
+        <p className="hub-code">Seal {code}</p>
       </div>
     </div>
+  );
+}
+
+/** Tangga wireframe: titik-titik profil anak tangga + salinannya sebagai kedalaman. */
+const STAIRS = (() => {
+  const front: [number, number][] = [[0, 100]];
+  for (let i = 0; i < 8; i++) {
+    const [x, y] = front[front.length - 1];
+    front.push([x, y - 11], [x + 19, y - 11]);
+  }
+  const back = front.map(([x, y]): [number, number] => [x - 30, y - 18]);
+  const path = (points: [number, number][]) =>
+    points.map(([x, y], i) => `${i ? "L" : "M"}${x},${y}`).join("");
+  const rungs = front.map(([x, y], i) => `M${x},${y}L${back[i][0]},${back[i][1]}`).join("");
+  return path(front) + path(back) + rungs;
+})();
+
+/** Basement — komponen ala basement.studio: nav wordmark, nominal raksasa,
+ *  grid sel bergaris, kutipan di atas garis, dan toggle pill. */
+function Basement(ctx: Ctx) {
+  const { draft, total, count } = ctx;
+  const amount = money(total, draft.currency);
+  const note = draft.thanks.filter(Boolean).join(" ");
+
+  return (
+    <>
+      <nav className="bs-nav">
+        {draft.logo && <Mark {...ctx} />}
+        <span className="bs-word">{(draft.store || "your store").toLowerCase()}.</span>
+        <span className="bs-status">
+          <i />
+          Paid<sup>({count})</sup>
+        </span>
+      </nav>
+
+      <section className="bs-hero">
+        <svg className="bs-stairs" viewBox="-32 -8 190 110" aria-hidden>
+          <path d={STAIRS} />
+        </svg>
+        <p className="bs-heading">{draft.title || "Payment receipt"}</p>
+        <p className="bs-amount" style={fitAmount(amount, 3.2, 19)}>
+          {amount}
+        </p>
+      </section>
+
+      {draft.items.length ? (
+        <div className="bs-wall">
+          {draft.items.map((item) => (
+            <div className="bs-cell" key={item.id}>
+              <strong>
+                {item.name || "Untitled item"}
+                <sup>({item.qty})</sup>
+              </strong>
+              {item.detail && <small>{item.detail}</small>}
+              <span>{money(item.qty * item.price, draft.currency)}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="receipt-empty">No items yet</p>
+      )}
+
+      <div className="bs-info">
+        <dl>
+          <div>
+            <dt>Receipt no.</dt>
+            <dd>#{draft.order || "0000"}</dd>
+          </div>
+          <div>
+            <dt>Date</dt>
+            <dd>{draft.date || "—"}</dd>
+          </div>
+          <div>
+            <dt>Paid via</dt>
+            <dd>{draft.payment || "—"}</dd>
+          </div>
+        </dl>
+        <Seal {...ctx} className="is-inline" tone="orange" />
+      </div>
+
+      {note && <p className="bs-quote">“{note}”</p>}
+
+      <div className="bs-toggle" aria-hidden>
+        <span className="is-on">Paid</span>
+        <span>Lunas</span>
+      </div>
+      <Code {...ctx} />
+    </>
+  );
+}
+
+/** Basement v2 — sel bertitik sudut, label piksel, arsir diagonal, ditutup
+ *  pita garis polisi lurus yang teksnya memuat nomor nota. */
+function BasementV2(ctx: Ctx) {
+  const { draft, total, count, code } = ctx;
+  const amount = money(total, draft.currency);
+  const note = draft.thanks.filter(Boolean).join(" ");
+  const tape = Array(8)
+    .fill(`PAID /// LUNAS /// #${draft.order || "0000"}`)
+    .join(" /// ");
+
+  return (
+    <>
+      <nav className="b2-nav">
+        {draft.logo && <Mark {...ctx} />}
+        <span className="bs-word">{(draft.store || "your store").toLowerCase()}.</span>
+        <span className="b2-dots" aria-hidden>
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="b2-tag">Paid</span>
+      </nav>
+
+      <section className="b2-cell b2-hero">
+        <p className="b2-label">{draft.title || "Payment receipt"}</p>
+        <p className="b2-amount" style={fitAmount(amount, 3, 17.5)}>
+          {amount}
+        </p>
+        <p className="b2-sub">
+          {count} {count === 1 ? "item" : "items"} / {draft.currency}
+        </p>
+      </section>
+
+      {draft.items.length ? (
+        <div className="b2-list">
+          {draft.items.map((item, i) => (
+            <div className="b2-cell b2-item" key={item.id}>
+              <span className="b2-index">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <strong>{item.name || "Untitled item"}</strong>
+                <small>
+                  {item.qty} × {money(item.price, draft.currency)}
+                  {item.detail && ` · ${item.detail}`}
+                </small>
+              </div>
+              <span className="b2-price">{money(item.qty * item.price, draft.currency)}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="receipt-empty">No items yet</p>
+      )}
+
+      <div className="b2-grid">
+        <dl className="b2-cell b2-info">
+          <div>
+            <dt>No.</dt>
+            <dd>#{draft.order || "0000"}</dd>
+          </div>
+          <div>
+            <dt>Date</dt>
+            <dd>{draft.date || "—"}</dd>
+          </div>
+          <div>
+            <dt>Via</dt>
+            <dd>{draft.payment || "—"}</dd>
+          </div>
+        </dl>
+        <div className="b2-cell b2-seal">
+          <Seal {...ctx} className="is-inline" tone="orange" />
+        </div>
+      </div>
+
+      {note && <p className="bs-quote">“{note}”</p>}
+
+      <p className="b2-code">Seal {code}</p>
+      <div className="b2-tape" aria-hidden>
+        <span>{tape}</span>
+      </div>
+    </>
   );
 }
 
@@ -765,6 +902,8 @@ const layouts: Record<Theme["layout"], (ctx: Ctx) => React.ReactNode> = {
   card: Card,
   folio: Folio,
   hub: Hub,
+  basement: Basement,
+  basement2: BasementV2,
   classic: Classic,
   poster: Poster,
   ticket: Ticket,

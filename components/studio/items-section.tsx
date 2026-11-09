@@ -2,10 +2,16 @@
 
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/toast";
-import { Section, controlClass } from "@/components/studio/section";
+import {
+  Kbd,
+  Section,
+  boxClass,
+  controlClass,
+  monoLabel,
+  segButton,
+} from "@/components/studio/section";
 import type { ReceiptStore } from "@/hooks/use-receipt";
 import { type Item, money } from "@/lib/receipt-utils";
 import { cn } from "@/lib/utils";
@@ -33,15 +39,18 @@ export function ItemsSection({ receipt }: { receipt: ReceiptStore }) {
 
   return (
     <Section
+      id="items"
       icon={ShoppingBag}
       title="Items"
-      description={`${totals.count} ${totals.count === 1 ? "unit" : "units"} across ${draft.items.length} ${draft.items.length === 1 ? "line" : "lines"}`}
+      meta={draft.items.length}
+      description={`${totals.count} ${totals.count === 1 ? "unit" : "units"} across ${draft.items.length} ${draft.items.length === 1 ? "line" : "lines"}.`}
     >
       {draft.items.length > 0 ? (
         <ul className="flex flex-col gap-3">
           {draft.items.map((item, index) => (
             <ItemRow
               key={item.id}
+              index={index}
               item={item}
               currency={draft.currency}
               onChange={(patch) => updateItem(item.id, patch)}
@@ -50,25 +59,17 @@ export function ItemsSection({ receipt }: { receipt: ReceiptStore }) {
           ))}
         </ul>
       ) : (
-        <p className="rounded-xl border border-dashed py-8 text-center text-sm text-muted-foreground">
-          No items yet. Add the first one below.
+        <p className={cn(monoLabel, "bg-surface-2 py-8 text-center text-muted-foreground")}>
+          No items yet — add the first one below
         </p>
       )}
 
-      <div className="mt-4 flex items-center justify-between gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={add}
-          className="h-9 gap-1.5 rounded-lg border-dashed border-input bg-transparent px-3"
-        >
-          <Plus className="size-4" /> Add item
-        </Button>
-        <p className="text-right text-sm text-muted-foreground">
-          Subtotal{" "}
-          <span className="ml-1 font-mono text-base font-medium text-foreground tabular-nums">
-            {money(totals.total, draft.currency)}
-          </span>
+      <div className="mt-4 flex gap-[2px]">
+        <button type="button" onClick={add} className={cn(segButton, "text-foreground")}>
+          <Plus className="size-3.5" /> Add item
+        </button>
+        <p className={cn(monoLabel, "flex min-w-0 flex-1 items-center justify-end gap-2 bg-surface-2 px-3 text-muted-foreground")}>
+          Subtotal <Kbd>{money(totals.total, draft.currency)}</Kbd>
         </p>
       </div>
     </Section>
@@ -76,19 +77,27 @@ export function ItemsSection({ receipt }: { receipt: ReceiptStore }) {
 }
 
 function ItemRow({
+  index,
   item,
   currency,
   onChange,
   onRemove,
 }: {
+  index: number;
   item: Item;
   currency: string;
   onChange: (patch: Partial<Item>) => void;
   onRemove: () => void;
 }) {
+  const stepper = cn(boxClass, "w-9 transition-colors hover:bg-surface-3 hover:text-foreground disabled:opacity-40 disabled:hover:bg-surface-2");
+
   return (
-    <li className="group grid grid-cols-[auto_1fr_auto] gap-3 rounded-xl border bg-surface-2/60 p-3 sm:grid-cols-[minmax(0,1fr)_auto_9.5rem_auto] sm:items-start">
-      <div className="col-span-3 flex min-w-0 flex-col gap-1.5 sm:col-span-1">
+    <li className="grid grid-cols-[auto_minmax(0,1fr)] gap-[2px]">
+      <span className={cn(boxClass, monoLabel, "row-span-2 h-auto text-muted-foreground")}>
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
+      <div className="flex min-w-0 flex-col gap-[2px]">
         <Input
           data-item-name
           aria-label="Item name"
@@ -106,64 +115,56 @@ function ItemRow({
         />
       </div>
 
-      <div
-        className="flex h-10 items-center rounded-lg border border-input bg-surface"
-        role="group"
-        aria-label="Quantity"
-      >
-        <Button
+      <div className="flex min-w-0 gap-[2px]">
+        <div className="flex gap-[2px]" role="group" aria-label="Quantity">
+          <button
+            type="button"
+            onClick={() => onChange({ qty: Math.max(1, item.qty - 1) })}
+            disabled={item.qty <= 1}
+            aria-label="Decrease quantity"
+            className={stepper}
+          >
+            <Minus className="size-3.5" />
+          </button>
+          <span className="grid w-9 place-items-center bg-surface-2 font-mono text-sm tabular-nums" aria-live="polite">
+            {item.qty}
+          </span>
+          <button
+            type="button"
+            onClick={() => onChange({ qty: item.qty + 1 })}
+            aria-label="Increase quantity"
+            className={stepper}
+          >
+            <Plus className="size-3.5" />
+          </button>
+        </div>
+
+        <label className="relative min-w-0 flex-1">
+          <span className={cn(monoLabel, "pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-foreground")}>
+            {currency}
+          </span>
+          <Input
+            aria-label={`Unit price in ${currency}`}
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step="any"
+            placeholder="0"
+            value={item.price || ""}
+            onChange={(e) => onChange({ price: Math.max(0, Number(e.target.value) || 0) })}
+            className={cn(controlClass, "pl-12 text-right font-mono tabular-nums")}
+          />
+        </label>
+
+        <button
           type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => onChange({ qty: Math.max(1, item.qty - 1) })}
-          disabled={item.qty <= 1}
-          aria-label="Decrease quantity"
-          className="h-full w-9 rounded-r-none"
+          onClick={onRemove}
+          aria-label={`Remove ${item.name || "item"}`}
+          className={cn(boxClass, "transition-colors hover:bg-danger hover:text-white")}
         >
-          <Minus className="size-3.5" />
-        </Button>
-        <span className="w-7 text-center font-mono text-sm tabular-nums" aria-live="polite">
-          {item.qty}
-        </span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => onChange({ qty: item.qty + 1 })}
-          aria-label="Increase quantity"
-          className="h-full w-9 rounded-l-none"
-        >
-          <Plus className="size-3.5" />
-        </Button>
+          <Trash2 className="size-4" />
+        </button>
       </div>
-
-      <label className="relative">
-        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center font-mono text-xs text-muted-foreground">
-          {currency}
-        </span>
-        <Input
-          aria-label={`Unit price in ${currency}`}
-          type="number"
-          inputMode="decimal"
-          min={0}
-          step="any"
-          placeholder="0"
-          value={item.price || ""}
-          onChange={(e) => onChange({ price: Math.max(0, Number(e.target.value) || 0) })}
-          className={cn(controlClass, "pl-12 text-right font-mono tabular-nums")}
-        />
-      </label>
-
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={onRemove}
-        aria-label={`Remove ${item.name || "item"}`}
-        className="size-10 justify-self-end text-muted-foreground hover:bg-danger/10 hover:text-danger"
-      >
-        <Trash2 className="size-4" />
-      </Button>
     </li>
   );
 }
