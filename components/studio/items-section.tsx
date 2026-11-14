@@ -13,7 +13,8 @@ import {
   segButton,
 } from "@/components/studio/section";
 import type { ReceiptStore } from "@/hooks/use-receipt";
-import { type Item, money } from "@/lib/receipt-utils";
+import { ComboInput } from "@/components/studio/combo-input";
+import { type Item, itemPresets, money } from "@/lib/receipt-utils";
 import { cn } from "@/lib/utils";
 
 export function ItemsSection({ receipt }: { receipt: ReceiptStore }) {
@@ -98,13 +99,12 @@ function ItemRow({
       </span>
 
       <div className="flex min-w-0 flex-col gap-[2px]">
-        <Input
-          data-item-name
-          aria-label="Item name"
-          placeholder="Item name"
+        <ComboInput
           value={item.name}
-          onChange={(e) => onChange({ name: e.target.value })}
-          className={cn(controlClass, "font-medium")}
+          onChange={(name) => onChange({ name })}
+          options={itemPresets}
+          placeholder="Item name — pick a preset or type your own"
+          inputProps={{ "data-item-name": true, "aria-label": "Item name", className: "font-medium" }}
         />
         <Input
           aria-label="Item detail"

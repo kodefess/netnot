@@ -55,6 +55,14 @@ export const createItem = (overrides: Partial<Item> = {}): Item => ({
   ...overrides,
 });
 
+/** Nama item siap pakai di input item; pengguna tetap bisa mengetik sendiri. */
+export const itemPresets = [
+  "Top Up via Payout",
+  "Top Up via Username",
+  "Top Up via Login",
+  "Roblox Digital Card",
+] as const;
+
 export const initialItems = (): Item[] => [
   { id: "seed-1", name: "Daily tote bag", detail: "natural / one size", qty: 1, price: 10000 },
   { id: "seed-2", name: "Studio mug", detail: "matte black", qty: 2, price: 20000 },
