@@ -51,6 +51,7 @@ export function Receipt({
           "--receipt-accent": theme.accent,
           "--receipt-on-accent": theme.onAccent,
           "--receipt-paper": theme.paper,
+          "--receipt-tint": theme.tint ?? theme.ink,
           "--receipt-radius": theme.radius,
           "--receipt-font": theme.font,
           "--receipt-weight": theme.weight,
@@ -411,23 +412,33 @@ function Wallet(ctx: Ctx) {
 }
 
 function MarginLayout(ctx: Ctx) {
-  const { draft } = ctx;
+  const { draft, total, count } = ctx;
   return (
     <>
+      {/* Pita kiri: logo di atas, nomor nota, nama toko diputar di bawah. */}
       <aside className="receipt-spine" aria-hidden>
+        <Mark {...ctx} />
+        <small>N° {draft.order || "0000"}</small>
         <span>{draft.store || "Your store"}</span>
       </aside>
-      <Seal {...ctx} />
-      <header className="receipt-head">
-        <Mark {...ctx} />
-        <Meta {...ctx} />
+      <header className="margin-head">
+        <span>{draft.title || "Payment receipt"}</span>
+        <span>{draft.date || "—"}</span>
       </header>
-      <Title {...ctx} />
+      <Seal {...ctx} />
+      <h2 className="margin-store">{draft.store || "Your store"}</h2>
       <Rule />
       <Items {...ctx} />
-      <Rule />
-      <Total {...ctx} />
-      <Payment {...ctx} />
+      <div className="margin-total">
+        <span>
+          Total · {count} {count === 1 ? "item" : "items"}
+        </span>
+        <strong>{money(total, draft.currency)}</strong>
+      </div>
+      <div className="margin-paid">
+        <span>Paid via</span>
+        <strong>{draft.payment || "Not specified"}</strong>
+      </div>
       <Thanks {...ctx} />
       <Code {...ctx} />
     </>
@@ -750,7 +761,7 @@ function Basement(ctx: Ctx) {
             <dd>{draft.payment || "—"}</dd>
           </div>
         </dl>
-        <Seal {...ctx} className="is-inline" tone="orange" />
+        <Seal {...ctx} className="is-inline" />
       </div>
 
       {note && <p className="bs-quote">“{note}”</p>}
@@ -835,7 +846,7 @@ function BasementV2(ctx: Ctx) {
           </div>
         </dl>
         <div className="b2-cell b2-seal">
-          <Seal {...ctx} className="is-inline" tone="orange" />
+          <Seal {...ctx} className="is-inline" />
         </div>
       </div>
 
@@ -854,7 +865,9 @@ function Folio(ctx: Ctx) {
   const { draft, total } = ctx;
   return (
     <>
-      <div className="folio-frame" aria-hidden />
+      <div className="folio-frame" aria-hidden>
+        <i /><i /><i /><i />
+      </div>
       <header className="folio-top">
         <span>N° {draft.order || "0000"}</span>
         <span>{draft.date || "—"}</span>
@@ -878,6 +891,7 @@ function Folio(ctx: Ctx) {
                   {item.detail && ` — ${item.detail}`}
                 </small>
               </div>
+              <i className="folio-leader" aria-hidden />
               <span>{money(item.qty * item.price, draft.currency)}</span>
             </div>
           ))}

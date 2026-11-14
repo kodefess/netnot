@@ -2,7 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { AUTH_COOKIE, AUTH_COOKIE_VALUE } from "@/lib/auth";
 
-const PUBLIC_PATHS = ["/gate", "/api/auth"];
+// Gambar share (Open Graph/Twitter) harus bisa diambil crawler tanpa login.
+const PUBLIC_PATHS = ["/gate", "/api/auth", "/opengraph-image", "/twitter-image"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

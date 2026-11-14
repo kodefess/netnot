@@ -7,16 +7,35 @@ import { SITE } from "@/lib/site";
 import { COLOR_SCHEME_SCRIPT } from "@/components/color-scheme-toggle";
 
 export const metadata: Metadata = {
-  title: `${SITE.title} — on-brand receipts in seconds`,
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: SITE.title,
+    template: `%s · ${SITE.title}`,
+  },
   description: SITE.description,
+  applicationName: SITE.title,
   generator: SITE.title,
+  keywords: ["JOYCO", "JOYCO Supply", "receipt generator", "receipt maker", "nota", "struk", "invoice"],
+  alternates: { canonical: "/" },
+  // Gambar share otomatis dari app/opengraph-image.tsx & twitter-image.tsx.
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: SITE.title,
+    title: SITE.title,
+    description: SITE.description,
+    locale: SITE.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.title,
+    description: SITE.description,
+  },
+  // Favicon = logo JOYCO.
   icons: {
-    icon: [
-      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
-      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: "/apple-icon.png",
+    icon: [{ url: "/joyco.png", type: "image/png", sizes: "200x200" }],
+    shortcut: "/joyco.png",
+    apple: "/joyco.png",
   },
 };
 
