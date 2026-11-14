@@ -158,7 +158,9 @@
   font-family: var(--receipt-font), ui-sans-serif, sans-serif;
   /* Tepi bawah bergerigi seperti kertas yang disobek dari gulungan. */
   mask:
-    linear-gradient(#000 0 0) top / 100% calc(100% - var(--zig)) no-repeat,
+    /* +1px supaya bertumpuk dengan gerigi: tanpa ini muncul celah sub-piksel
+       yang terlihat sebagai garis tipis di atas gerigi. */
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--zig) + 1px) no-repeat,
     conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg)
       bottom / calc(var(--zig) * 2) var(--zig) repeat-x;
 }
@@ -731,29 +733,141 @@
 
 /* -- Margin: pita biru vertikal dengan nama toko diputar -- */
 .receipt[data-layout="margin"] {
-  padding-left: calc(var(--pad-x) + 2.75rem);
+  --spine: 3.1rem;
+  padding-left: calc(var(--pad-x) + var(--spine));
+  padding-top: 1.9rem;
 }
 .receipt-spine {
   position: absolute;
   inset: 0 auto 0 0;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  width: 2.75rem;
-  padding: 1.5rem 0 calc(1.5rem + var(--zig));
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: var(--spine);
+  padding: 1.1rem 0 calc(1.4rem + var(--zig));
   background: var(--receipt-accent);
   color: var(--receipt-on-accent);
+  /* Hairline terang di sisi dalam pita, seperti punggung buku. */
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--receipt-on-accent) 22%, transparent);
 }
+.receipt-spine .receipt-mark {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 3px;
+  background: var(--receipt-on-accent);
+  color: var(--receipt-accent);
+  font-size: 0.95rem;
+}
+.receipt-spine small,
 .receipt-spine span {
-  max-height: 100%;
-  overflow: hidden;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  font-size: 1.05rem;
-  font-weight: var(--receipt-weight);
-  letter-spacing: 0.02em;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
+}
+.receipt-spine small {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.receipt-spine span {
+  margin-top: auto;
+  max-height: 60%;
+  font-size: 1.25rem;
+  font-weight: var(--receipt-weight);
+  letter-spacing: -0.01em;
+}
+.margin-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1.5px solid var(--receipt-ink);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.margin-head span:first-child {
+  color: var(--receipt-accent);
+  font-weight: 600;
+}
+.margin-head span:last-child {
+  opacity: 0.6;
+}
+.receipt[data-layout="margin"] .receipt-stamp {
+  top: 3.6rem;
+  right: 0.9rem;
+  width: 5rem;
+  height: 5rem;
+}
+.margin-store {
+  margin: 1.5rem 0 0;
+  padding-right: 4.5rem;
+  font-size: 2.2rem;
+  font-weight: var(--receipt-weight);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+}
+.receipt[data-layout="margin"] .receipt-rule {
+  margin: 1.3rem 0 1.1rem;
+}
+.margin-total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 1.2rem;
+  padding-top: 0.9rem;
+  border-top: 1.5px solid var(--receipt-ink);
+}
+.margin-total span {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.margin-total strong {
+  color: var(--receipt-accent);
+  font-size: 2.1rem;
+  font-weight: var(--receipt-weight);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.margin-paid {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.55rem 0 0.55rem 0.75rem;
+  border-left: 3px solid var(--receipt-accent);
+  font-size: 0.82rem;
+}
+.margin-paid span {
+  opacity: 0.6;
+}
+.margin-paid strong {
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.receipt[data-layout="margin"] .receipt-thanks {
+  margin-top: 1.3rem;
+  text-align: left;
+  color: var(--receipt-ink);
+  font-size: 0.9rem;
+}
+.receipt[data-layout="margin"] .receipt-seal-code {
+  text-align: left;
 }
 
 /* -- Swiss (Mono): grid presisi, label mono kecil, hairline -- */
@@ -1104,11 +1218,13 @@
    tenang. Semua abu-abu diturunkan dari ink & paper, jadi varian gelap/
    terang cukup beda di objek tema. -- */
 .receipt[data-layout="hub"] {
-  --hub-panel: color-mix(in srgb, var(--receipt-ink) 6%, var(--receipt-paper));
-  --hub-seg: color-mix(in srgb, var(--receipt-ink) 11%, var(--receipt-paper));
-  --hub-seg-hi: color-mix(in srgb, var(--receipt-ink) 19%, var(--receipt-paper));
+  /* Panel & segmen diwarnai --receipt-tint (default ink → abu; Studio
+     Light memakai biru brand sehingga segmennya biru muda). */
+  --hub-panel: color-mix(in srgb, var(--receipt-tint) 6%, var(--receipt-paper));
+  --hub-seg: color-mix(in srgb, var(--receipt-tint) 11%, var(--receipt-paper));
+  --hub-seg-hi: color-mix(in srgb, var(--receipt-tint) 19%, var(--receipt-paper));
   --hub-muted: color-mix(in srgb, var(--receipt-ink) 60%, var(--receipt-paper));
-  --hub-line: color-mix(in srgb, var(--receipt-ink) 22%, transparent);
+  --hub-line: color-mix(in srgb, var(--receipt-tint) 22%, transparent);
   --hub-mono: var(--font-roboto-mono), ui-monospace, monospace;
   --hub-rail: 2.5rem;
   padding: 0 0 var(--zig);
@@ -1763,25 +1879,38 @@
 }
 .folio-frame {
   position: absolute;
-  inset: 0.65rem 0.65rem calc(var(--zig) + 0.65rem);
-  border: 1px solid color-mix(in srgb, var(--receipt-ink) 60%, transparent);
+  inset: 0.7rem 0.7rem calc(var(--zig) + 0.7rem);
+  border: 1px solid color-mix(in srgb, var(--receipt-accent) 70%, transparent);
   pointer-events: none;
 }
 .folio-frame::after {
   content: "";
   position: absolute;
-  inset: 3px;
-  border: 0.5px solid color-mix(in srgb, var(--receipt-ink) 35%, transparent);
+  inset: 4px;
+  border: 0.5px solid color-mix(in srgb, var(--receipt-accent) 35%, transparent);
 }
+/* Ornamen belah ketupat kecil di keempat sudut bingkai. */
+.folio-frame i {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--receipt-paper);
+  border: 1px solid var(--receipt-accent);
+  transform: rotate(45deg);
+}
+.folio-frame i:nth-child(1) { top: -4px; left: -4px; }
+.folio-frame i:nth-child(2) { top: -4px; right: -4px; }
+.folio-frame i:nth-child(3) { bottom: -4px; left: -4px; }
+.folio-frame i:nth-child(4) { bottom: -4px; right: -4px; }
 .folio-top {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
   font-family: var(--font-geist), ui-sans-serif, sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.2em;
+  font-size: 0.56rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 .folio-monogram {
   display: flex;
@@ -1809,8 +1938,9 @@
   opacity: 0.7;
 }
 .folio-store {
-  margin: 0.35rem 0 0;
-  font-size: 2.3rem;
+  margin: 0.4rem 0 0;
+  color: var(--receipt-accent);
+  font-size: 2.5rem;
   font-weight: var(--receipt-weight);
   font-style: italic;
   line-height: 1;
@@ -1822,12 +1952,13 @@
   align-items: center;
   gap: 0.6rem;
   margin: 1.1rem auto 1.2rem;
-  max-width: 9rem;
+  max-width: 10rem;
+  color: var(--receipt-accent);
   font-size: 0.7rem;
 }
 .folio-ornament span {
   flex: 1;
-  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 40%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--receipt-accent) 45%, transparent);
 }
 .folio-items {
   display: flex;
@@ -1838,8 +1969,7 @@
 .folio-item {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 .folio-item > div {
   min-width: 0;
@@ -1858,6 +1988,11 @@
   font-style: italic;
   opacity: 0.65;
 }
+.folio-leader {
+  flex: 1;
+  min-width: 1rem;
+  border-bottom: 1px dotted color-mix(in srgb, var(--receipt-ink) 35%, transparent);
+}
 .folio-item > span {
   flex-shrink: 0;
   font-size: 1.05rem;
@@ -1868,10 +2003,10 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 1.2rem;
-  padding: 0.8rem 0 0.7rem;
-  border-top: 1px solid color-mix(in srgb, var(--receipt-ink) 50%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--receipt-ink) 50%, transparent);
+  margin-top: 1.3rem;
+  padding: 0.85rem 0 0.75rem;
+  border-top: 3px double color-mix(in srgb, var(--receipt-accent) 60%, transparent);
+  border-bottom: 3px double color-mix(in srgb, var(--receipt-accent) 60%, transparent);
   text-align: left;
 }
 .folio-total span {
@@ -1879,7 +2014,8 @@
   font-style: italic;
 }
 .folio-total strong {
-  font-size: 1.75rem;
+  color: var(--receipt-accent);
+  font-size: 1.85rem;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
@@ -1889,7 +2025,8 @@
 }
 .receipt[data-layout="folio"] .receipt-thanks {
   margin-top: 1rem;
-  font-size: 1.1rem;
+  color: var(--receipt-accent);
+  font-size: 1.15rem;
   font-weight: 400;
   font-style: italic;
   line-height: 1.3;
@@ -1968,6 +2105,14 @@
   font-size: 1.35rem;
   font-weight: 800;
   color: #ffffff;
+  overflow: hidden;
+}
+/* Logo JOYCO (sudah berlatar biru brand) mengisi penuh kotak rail. */
+.gate-rail .gate-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .gate-tab {
   display: flex;
@@ -2061,17 +2206,110 @@
 .gate-art {
   position: relative;
   display: block;
-  height: 10rem;
+  padding: 1.1rem 1.25rem;
   background: var(--gate-panel);
   color: var(--brand);
 }
 .gate-art svg {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
   fill: none;
   stroke: currentColor;
   stroke-width: 1;
+}
+
+/* ---- Diagram alir beranimasi di gate (gaya xmcp.dev) ---- */
+.flow {
+  --flow-line: color-mix(in srgb, var(--gate-ink) 42%, transparent);
+  --flow-dim: color-mix(in srgb, var(--gate-ink) 24%, transparent);
+  --flow-ink: color-mix(in srgb, var(--gate-ink) 80%, transparent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.flow-dots {
+  stroke: var(--flow-dim);
+  stroke-dasharray: 1 3.5;
+  animation: flow-march 1s linear infinite;
+}
+.flow-bus {
+  stroke: var(--flow-line);
+}
+.flow-node {
+  fill: var(--flow-ink);
+  stroke: none;
+}
+.flow-node.is-hollow {
+  fill: var(--gate-panel);
+  stroke: var(--flow-ink);
+}
+.flow-item,
+.flow-out {
+  stroke: var(--flow-ink);
+  stroke-width: 1.2;
+}
+.flow-item {
+  animation: flow-item 3s ease-in-out infinite;
+}
+.flow-out {
+  animation: flow-out 3s ease-in-out infinite;
+}
+.flow-receipt {
+  stroke: var(--flow-ink);
+  stroke-width: 1.2;
+  fill: var(--gate-panel);
+}
+.flow-receipt-head {
+  stroke: var(--flow-ink);
+  stroke-width: 2;
+}
+.flow-receipt-mark {
+  fill: var(--brand);
+  stroke: none;
+}
+.flow-print {
+  stroke: var(--flow-line);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: flow-print 3s ease-out infinite;
+}
+.flow-print.is-total {
+  stroke: var(--brand);
+  stroke-width: 2;
+  animation-delay: 0.36s;
+}
+.flow-pulse {
+  fill: var(--brand);
+  stroke: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px var(--brand));
+}
+@keyframes flow-march {
+  to {
+    stroke-dashoffset: -9;
+  }
+}
+/* Item menyala saat partikelnya berangkat. */
+@keyframes flow-item {
+  0%, 18% { stroke: var(--brand); }
+  32%, 100% { stroke: var(--flow-ink); }
+}
+/* Baris nota tercetak setelah partikel tiba (~38%), lalu dihapus di akhir siklus. */
+@keyframes flow-print {
+  0%, 36% { stroke-dashoffset: 1; }
+  52%, 90% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 1; }
+}
+/* Hasil menyala saat partikel keluar tiba (~86%). */
+@keyframes flow-out {
+  0%, 82% { stroke: var(--flow-ink); }
+  88%, 96% { stroke: var(--brand); }
+  100% { stroke: var(--flow-ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-pulse { display: none; }
+  .flow-print { stroke-dashoffset: 0; animation: none; }
 }
 .gate-corner {
   position: absolute;
@@ -2099,13 +2337,15 @@
   bottom: 6px;
   border-width: 0 1.5px 1.5px 0;
 }
-@media (max-height: 720px) {
+@media (max-height: 640px) {
   .gate-art {
-    height: 6.5rem;
+    padding: 0.6rem 2.5rem;
   }
 }
+/* Judul & deskripsi dalam panel sendiri, menyatu dengan segmen lain. */
 .gate-body {
-  padding: 1.35rem 0 0;
+  padding: 1.1rem 1.25rem 1.2rem;
+  background: var(--gate-panel);
 }
 .gate-chip {
   display: inline-block;
@@ -2119,15 +2359,15 @@
   color: var(--gate-muted);
 }
 .gate-body h1 {
-  margin: 0.7rem 0 0;
-  font-size: 2rem;
+  margin: 0.75rem 0 0;
+  font-size: 1.65rem;
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
 .gate-body > p {
-  margin: 0.5rem 0 0;
-  font-size: 0.92rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.86rem;
   line-height: 1.5;
   color: var(--gate-muted);
 }
@@ -2135,7 +2375,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: 1.25rem;
 }
 .gate-field {
   display: flex;
@@ -2194,7 +2433,8 @@
   align-items: center;
   gap: 0.45rem;
   margin: 0;
-  padding: 0.55rem 0.1rem;
+  padding: 0.6rem 0.85rem;
+  background: color-mix(in srgb, var(--danger) 12%, var(--gate-panel));
   font-size: 0.82rem;
   color: var(--danger);
 }

@@ -1,7 +1,17 @@
+/** Origin publik untuk URL absolut (Open Graph, canonical). Di dev memakai
+ * localhost; selain itu domain production, kecuali diganti lewat env. */
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.NODE_ENV === "development" ? "http://localhost:3001" : "https://joycosupply.vercel.app");
+
 export const SITE = {
   brand: "JOYCO",
-  product: "Receipt",
-  title: "JOYCO Receipt",
+  product: "Supply",
+  title: "JOYCO Supply",
+  tagline: "On-brand receipts in seconds",
   defaultLogo: "/joyco.png",
-  description: "Create beautiful, on-brand receipts for your store in seconds.",
+  description:
+    "JOYCO Supply is the receipt studio for JOYCO stores. Design clean, on-brand receipts, then download, print, or share them in seconds.",
+  url: SITE_URL,
+  locale: "en_US",
 };

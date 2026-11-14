@@ -129,9 +129,10 @@ function StudioRail() {
       <a
         href="/"
         aria-label={SITE.title}
-        className="grid h-[3.25rem] shrink-0 place-items-center bg-brand text-xl font-extrabold text-brand-foreground"
+        className="block h-[3.25rem] shrink-0 overflow-hidden bg-brand"
       >
-        {SITE.brand.charAt(0)}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/joyco.png" alt="" width={200} height={200} className="size-full object-cover" />
       </a>
       <span className="flex flex-col items-center gap-3 bg-surface-3 py-4 text-foreground">
         <span className={cn(monoLabel, "rotate-180 font-semibold [writing-mode:vertical-rl]")}>Studio</span>
@@ -173,9 +174,10 @@ function SiteHeader({ receipt }: { receipt: ReceiptStore }) {
       <a
         href="/"
         aria-label={SITE.title}
-        className="grid w-[3.25rem] shrink-0 place-items-center bg-brand text-xl font-extrabold text-brand-foreground lg:hidden"
+        className="block w-[3.25rem] shrink-0 overflow-hidden bg-brand lg:hidden"
       >
-        {SITE.brand.charAt(0)}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/joyco.png" alt="" width={200} height={200} className="size-full object-cover" />
       </a>
       <div className="flex min-w-0 flex-1 items-center gap-3 bg-surface-2 px-3 sm:px-4">
         <svg viewBox="0 0 16 16" aria-hidden className="size-3.5 shrink-0 fill-none stroke-muted-foreground stroke-[1.4]">

@@ -29,7 +29,7 @@ export function StyleSection({ receipt }: { receipt: ReceiptStore }) {
         </button>
       }
     >
-      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 xl:grid-cols-4">
+      <div role="radiogroup" aria-label="Receipt style" className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 xl:grid-cols-4">
         {themes.map((t) => (
           <ThemeTile
             key={t.id}
@@ -59,14 +59,21 @@ function ThemeTile({
       aria-checked={active}
       onClick={onSelect}
       className={cn(
-        "group relative flex flex-col overflow-hidden bg-surface-2 text-left -outline-offset-[1.5px] transition-colors hover:bg-surface-3",
-        active && "outline-[1.5px] outline-brand outline-solid",
+        "group relative flex flex-col overflow-hidden border bg-surface-2 text-left transition-[border-color,background-color,box-shadow] duration-150",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        active
+          ? "border-brand bg-brand/10 shadow-[0_0_0_1px_var(--brand)]"
+          : "border-border hover:border-border-strong hover:bg-surface-3",
       )}
     >
       {/* Mini nota: semua tema biru, jadi yang ditonjolkan adalah susunan
           (layout) dan typeface-nya. */}
       <span
-        className={cn("relative block h-24 overflow-hidden", `pattern-${theme.pattern}`)}
+        className={cn(
+          "relative block h-24 overflow-hidden border-b transition-[filter] duration-150",
+          active ? "border-brand" : "border-border",
+          `pattern-${theme.pattern}`,
+        )}
         style={
           {
             "--receipt-ink": theme.ink,
@@ -75,18 +82,34 @@ function ThemeTile({
           } as React.CSSProperties
         }
       >
-        <LayoutSketch theme={theme} />
-        {active && (
-          <span className="absolute top-0 right-0 grid size-5 place-items-center bg-brand text-brand-foreground">
-            <Check className="size-3" strokeWidth={3} />
-          </span>
-        )}
-      </span>
-      <span className="block px-2.5 py-2">
-        <span className="block truncate font-mono text-[11px] font-semibold tracking-[0.04em] uppercase">
-          {theme.name}
+        <span className="relative block h-full origin-top transition-transform duration-200 group-hover:scale-[1.03]">
+          <LayoutSketch theme={theme} />
         </span>
-        <span className="block truncate text-xs text-muted-foreground">{theme.vibe}</span>
+      </span>
+      <span className="flex items-center gap-2 px-2.5 py-2">
+        <span className="min-w-0 flex-1">
+          <span
+            className={cn(
+              "block truncate font-mono text-[11px] font-semibold tracking-[0.04em] uppercase",
+              active && "text-brand-text",
+            )}
+          >
+            {theme.name}
+          </span>
+          <span className="block truncate text-xs text-muted-foreground">{theme.vibe}</span>
+        </span>
+        {/* Indikator radio: kotak kosong saat idle, terisi biru + centang saat aktif. */}
+        <span
+          aria-hidden
+          className={cn(
+            "grid size-4 shrink-0 place-items-center border transition-colors",
+            active
+              ? "border-brand bg-brand text-brand-foreground"
+              : "border-border-strong text-transparent group-hover:border-muted-foreground",
+          )}
+        >
+          <Check className="size-2.5" strokeWidth={3.5} />
+        </span>
       </span>
     </button>
   );
@@ -149,13 +172,14 @@ function LayoutSketch({ theme }: { theme: Theme }) {
         </span>
       );
     case "hub": {
-      const seg = `color-mix(in srgb, ${ink} 14%, ${theme.paper})`;
+      const tint = theme.tint ?? ink;
+      const seg = `color-mix(in srgb, ${tint} 14%, ${theme.paper})`;
       return (
         <span className="flex h-full gap-[2px]">
           {/* Sidebar rail: logo biru, tab aktif, kotak ikon. */}
           <span className="flex w-3.5 flex-col gap-[2px]">
             <span className="h-3.5" style={{ background: accent }} />
-            <span className="h-6" style={{ background: `color-mix(in srgb, ${ink} 24%, ${theme.paper})` }} />
+            <span className="h-6" style={{ background: `color-mix(in srgb, ${tint} 24%, ${theme.paper})` }} />
             <span className="flex-1" style={{ background: seg }} />
           </span>
           <span className="flex flex-1 flex-col gap-[2px] py-1.5 pr-2 pl-1">
@@ -205,17 +229,17 @@ function LayoutSketch({ theme }: { theme: Theme }) {
       );
     case "folio":
       return (
-        <span className="absolute inset-1.5 flex flex-col items-center border pt-1.5" style={{ borderColor: `${ink}99` }}>
+        <span className="absolute inset-1.5 flex flex-col items-center border pt-1.5" style={{ borderColor: `${accent}aa` }}>
           <span
             className="grid size-5 place-items-center rounded-full border italic"
             style={{ ...type("11px"), borderColor: accent }}
           >
             A
           </span>
-          <span className="mt-1 italic" style={type("16px")}>Aa</span>
-          <span className="mt-1 flex items-center gap-1 text-[6px]" style={{ color: ink }}>
-            <span className="block w-4 border-t" style={{ borderColor: `${ink}66` }} />✦
-            <span className="block w-4 border-t" style={{ borderColor: `${ink}66` }} />
+          <span className="mt-1 italic" style={type("16px", accent)}>Aa</span>
+          <span className="mt-1 flex items-center gap-1 text-[6px]" style={{ color: accent }}>
+            <span className="block w-4 border-t" style={{ borderColor: `${accent}77` }} />✦
+            <span className="block w-4 border-t" style={{ borderColor: `${accent}77` }} />
           </span>
         </span>
       );
@@ -278,7 +302,8 @@ function LayoutSketch({ theme }: { theme: Theme }) {
     case "margin":
       return (
         <span className="flex h-full">
-          <span className="flex w-5 items-end justify-center pb-2" style={{ background: accent }}>
+          <span className="flex w-5 flex-col items-center justify-between pt-1.5 pb-2" style={{ background: accent }}>
+            <span className="block size-2.5 rounded-[1px]" style={{ background: onAccent }} />
             <span
               className="block"
               style={{ ...type("10px", onAccent), writingMode: "vertical-rl", transform: "rotate(180deg)" }}
@@ -286,9 +311,11 @@ function LayoutSketch({ theme }: { theme: Theme }) {
               Aa
             </span>
           </span>
-          <span className="block flex-1 px-3 pt-3">
-            <span className="block" style={type("18px")}>Aa</span>
-            <span className="mt-2 block">{lines}</span>
+          <span className="block flex-1 px-3 pt-2.5">
+            <span className="block border-b pb-1" style={{ borderColor: ink }}>{line("35%", 0.8, accent)}</span>
+            <span className="mt-1.5 block tracking-tight" style={type("18px")}>Aa</span>
+            <span className="mt-1.5 block">{line("50%")}</span>
+            <span className="mt-1.5 block" style={type("11px", accent)}>50.000</span>
           </span>
         </span>
       );
